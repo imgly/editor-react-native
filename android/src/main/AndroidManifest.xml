@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="ly.img.editor.reactnative.module">
+  <application>
+    <activity
+      android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
+      android:name=".activity.EditorActivity" />
+  </application>
+</manifest>

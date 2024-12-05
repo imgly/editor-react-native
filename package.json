@@ -1,0 +1,46 @@
+{
+  "name": "@imgly/editor-react-native",
+  "version": "1.40.0",
+  "description": "CreativeEditor SDK for React Native - enable photo, video and design editing for your users on iOS and Android.",
+  "react-native": "index.js",
+  "source": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "src",
+    "index.js",
+    "index.d.ts",
+    "android",
+    "ios",
+    "IMGLYEditorModule.podspec",
+    "README.md",
+    "LICENSE.md",
+    "!android/build",
+    "!ios/build",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__"
+  ],
+  "keywords": [
+    "react-native",
+    "ios",
+    "android",
+    "cesdk",
+    "editor",
+    "imgly"
+  ],
+  "author": "IMG.LY GmbH",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "homepage": "https://img.ly",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "codegenConfig": {
+    "name": "IMGLYEditorModuleSpec",
+    "type": "modules",
+    "jsSrcsDir": "./",
+    "android": {
+      "javaPackageName": "ly.img.editor.reactnative.module"
+    }
+  }
+}
