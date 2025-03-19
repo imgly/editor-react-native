@@ -1,4 +1,4 @@
-# IMG.LY Editor
+# React Native Video Editor and Image Editor
 
 The `@imgly/editor-react-native` React Native module contains the prebuilt iOS and Android editors of the _Creative Engine_, the UI for CE.SDK - made accessible for React Native.
 The Creative Engine enables you to build any design editing UI, automation and creative workflow.
