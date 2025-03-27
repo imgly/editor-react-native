@@ -134,12 +134,11 @@ class IMGLYEditorModule(
         val activity = this.currentActivity ?: return
         this.completion = completion
 
-        val intent =
-            Intent(activity, EditorActivity::class.java).apply {
-                putExtra(EditorActivity.INTENT_EXTRA_CONFIG, config)
-                putExtra(EditorActivity.INTENT_EXTRA_PRESET, preset as Parcelable)
-                putExtra(EditorActivity.INTENT_EXTRA_METADATA, IntentHelper.mapToBundle(metadata))
-            }
+        val intent = Intent(activity, EditorActivity::class.java).apply {
+            putExtra(EditorActivity.INTENT_EXTRA_CONFIG, config)
+            putExtra(EditorActivity.INTENT_EXTRA_PRESET, preset as Parcelable)
+            putExtra(EditorActivity.INTENT_EXTRA_METADATA, IntentHelper.mapToBundle(metadata))
+        }
         activity.startActivityForResult(intent, EditorActivity.INTENT_REQUEST_CODE)
     }
 
@@ -204,22 +203,21 @@ class IMGLYEditorModule(
         value: WritableMap?,
     ) = this.putMap(id, value)
 
-    private fun reactMap(vararg pairs: Pair<String, Any?>) =
-        Arguments.createMap().apply {
-            pairs.forEach { (id, value) ->
-                when (value) {
-                    null -> putNull(id)
-                    is String -> putString(id, value)
-                    is Boolean -> putBoolean(id, value)
-                    is Double -> putDouble(id, value)
-                    is Float -> putDouble(id, value.toDouble())
-                    is Int -> putInt(id, value)
-                    is WritableMap -> putMap(id, value)
-                    is WritableArray -> putArray(id, value)
-                    else -> error("Unsupported type for WritableMap: ${value::class.simpleName}")
-                }
+    private fun reactMap(vararg pairs: Pair<String, Any?>) = Arguments.createMap().apply {
+        pairs.forEach { (id, value) ->
+            when (value) {
+                null -> putNull(id)
+                is String -> putString(id, value)
+                is Boolean -> putBoolean(id, value)
+                is Double -> putDouble(id, value)
+                is Float -> putDouble(id, value.toDouble())
+                is Int -> putInt(id, value)
+                is WritableMap -> putMap(id, value)
+                is WritableArray -> putArray(id, value)
+                else -> error("Unsupported type for WritableMap: ${value::class.simpleName}")
             }
         }
+    }
 
     private fun convertToWritableMap(map: Map<*, *>): WritableMap {
         val writableMap = Arguments.createMap()
@@ -243,10 +241,11 @@ class IMGLYEditorModule(
         return writableMap
     }
 
-    private inline fun <reified T : Serializable> Intent.getSerializableExtraCompat(key: String): T? =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            getSerializableExtra(key, T::class.java)
-        } else {
-            getSerializableExtra(key) as T
-        }
+    private inline fun <reified T : Serializable> Intent.getSerializableExtraCompat(key: String): T? = if (Build.VERSION.SDK_INT >=
+        Build.VERSION_CODES.TIRAMISU
+    ) {
+        getSerializableExtra(key, T::class.java)
+    } else {
+        getSerializableExtra(key) as T
+    }
 }

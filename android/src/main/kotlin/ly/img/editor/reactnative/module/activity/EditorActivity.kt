@@ -44,9 +44,7 @@ class EditorActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val config =
-            intent.extras?.getParcelableCompat<EditorSettings>(INTENT_EXTRA_CONFIG)
-                ?: return
+        val config = intent.extras?.getParcelableCompat<EditorSettings>(INTENT_EXTRA_CONFIG) ?: return
         val preset = intent.extras?.getParcelableCompat<EditorPreset>(INTENT_EXTRA_PRESET) ?: EditorPreset.DESIGN
         val metadataBundle = intent.extras?.getParcelableCompat<Bundle>(INTENT_EXTRA_METADATA)
         val metadata = IntentHelper.bundleToMap(metadataBundle)
@@ -55,37 +53,34 @@ class EditorActivity : ComponentActivity() {
         setContent {
             builder(
                 CustomBuilderScope(config, preset, metadata, { result ->
-                    val (resolvedResult, resultCode) =
-                        result.fold(
-                            onFailure = { error ->
-                                Pair(error, INTENT_RESULT_ERROR_CODE)
-                            },
-                            onSuccess = { value ->
-                                Pair(value, Activity.RESULT_OK)
-                            },
-                        )
+                    val (resolvedResult, resultCode) = result.fold(
+                        onFailure = { error ->
+                            Pair(error, INTENT_RESULT_ERROR_CODE)
+                        },
+                        onSuccess = { value ->
+                            Pair(value, Activity.RESULT_OK)
+                        },
+                    )
 
-                    val resultIntent =
-                        Intent().apply {
-                            when (resultCode) {
-                                INTENT_RESULT_ERROR_CODE -> {
-                                    putExtra(INTENT_EXTRA_RESULT, resolvedResult as Serializable)
-                                }
+                    val resultIntent = Intent().apply {
+                        when (resultCode) {
+                            INTENT_RESULT_ERROR_CODE -> {
+                                putExtra(INTENT_EXTRA_RESULT, resolvedResult as Serializable)
+                            }
 
-                                Activity.RESULT_OK -> {
-                                    putExtra(INTENT_EXTRA_RESULT, resolvedResult as Parcelable)
-                                }
+                            Activity.RESULT_OK -> {
+                                putExtra(INTENT_EXTRA_RESULT, resolvedResult as Parcelable)
                             }
                         }
+                    }
 
                     setResult(resultCode, resultIntent)
                     finish()
                 }, {
                     if (it != null) {
-                        val resultIntent =
-                            Intent().apply {
-                                putExtra(INTENT_EXTRA_RESULT, it)
-                            }
+                        val resultIntent = Intent().apply {
+                            putExtra(INTENT_EXTRA_RESULT, it)
+                        }
                         setResult(INTENT_RESULT_ERROR_CODE, resultIntent)
                     }
                     finish()
@@ -94,19 +89,19 @@ class EditorActivity : ComponentActivity() {
         }
     }
 
-    private fun builderForPreset(preset: EditorPreset): Builder =
-        when (preset) {
-            EditorPreset.APPAREL -> EditorBuilder.apparel()
-            EditorPreset.POSTCARD -> EditorBuilder.postcard()
-            EditorPreset.PHOTO -> EditorBuilder.photo()
-            EditorPreset.DESIGN -> EditorBuilder.design()
-            EditorPreset.VIDEO -> EditorBuilder.video()
-        }
+    private fun builderForPreset(preset: EditorPreset): Builder = when (preset) {
+        EditorPreset.APPAREL -> EditorBuilder.apparel()
+        EditorPreset.POSTCARD -> EditorBuilder.postcard()
+        EditorPreset.PHOTO -> EditorBuilder.photo()
+        EditorPreset.DESIGN -> EditorBuilder.design()
+        EditorPreset.VIDEO -> EditorBuilder.video()
+    }
 
-    private inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String): T? =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            getParcelable(key, T::class.java)
-        } else {
-            getParcelable(key)
-        }
+    private inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String): T? = if (Build.VERSION.SDK_INT >=
+        Build.VERSION_CODES.TIRAMISU
+    ) {
+        getParcelable(key, T::class.java)
+    } else {
+        getParcelable(key)
+    }
 }

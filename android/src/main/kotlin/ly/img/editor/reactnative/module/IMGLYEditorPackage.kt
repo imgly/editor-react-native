@@ -10,26 +10,24 @@ class IMGLYEditorPackage : TurboReactPackage() {
     override fun getModule(
         name: String,
         reactContext: ReactApplicationContext,
-    ): NativeModule? =
-        if (name == IMGLYEditorModule.NAME) {
-            IMGLYEditorModule(reactContext)
-        } else {
-            null
-        }
+    ): NativeModule? = if (name == IMGLYEditorModule.NAME) {
+        IMGLYEditorModule(reactContext)
+    } else {
+        null
+    }
 
-    override fun getReactModuleInfoProvider() =
-        ReactModuleInfoProvider {
-            mapOf(
-                IMGLYEditorModule.NAME to
-                    ReactModuleInfo(
-                        IMGLYEditorModule.NAME,
-                        IMGLYEditorModule.NAME,
-                        false, // canOverrideExistingModule
-                        false, // needsEagerInit
-                        true, // hasConstants
-                        false, // isCxxModule
-                        true, // isTurboModule
-                    ),
-            )
-        }
+    override fun getReactModuleInfoProvider() = ReactModuleInfoProvider {
+        mapOf(
+            IMGLYEditorModule.NAME to
+                ReactModuleInfo(
+                    IMGLYEditorModule.NAME,
+                    IMGLYEditorModule.NAME,
+                    false, // canOverrideExistingModule
+                    false, // needsEagerInit
+                    true, // hasConstants
+                    false, // isCxxModule
+                    true, // isTurboModule
+                ),
+        )
+    }
 }

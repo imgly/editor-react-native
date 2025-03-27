@@ -27,18 +27,17 @@ data class Source(
 
         override fun newArray(size: Int): Array<Source?> = arrayOfNulls(size)
 
-        fun createFromMap(map: Map<String, Any>): Source? =
-            runCatching {
-                val source = map["source"] as? String
-                val typeRaw = map["type"] as? String
+        fun createFromMap(map: Map<String, Any>): Source? = runCatching {
+            val source = map["source"] as? String
+            val typeRaw = map["type"] as? String
 
-                source?.let { s ->
-                    typeRaw?.let { t ->
-                        EditorSourceType.fromValue(t)?.let { type ->
-                            Source(s, type)
-                        }
+            source?.let { s ->
+                typeRaw?.let { t ->
+                    EditorSourceType.fromValue(t)?.let { type ->
+                        Source(s, type)
                     }
                 }
-            }.getOrNull()
+            }
+        }.getOrNull()
     }
 }

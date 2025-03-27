@@ -62,45 +62,39 @@ data class CustomBuilderScope(
 class EditorBuilder {
     companion object {
         /** The default design editor. */
-        fun design(): Builder =
-            {
-                ModalDesignEditor(settings, result, onClose)
-            }
+        fun design(): Builder = {
+            ModalDesignEditor(settings, result, onClose)
+        }
 
         /** The default postcard editor. */
-        fun postcard(): Builder =
-            {
-                ModalPostcardEditor(settings, result, onClose)
-            }
+        fun postcard(): Builder = {
+            ModalPostcardEditor(settings, result, onClose)
+        }
 
         /** The default apparel editor. */
-        fun apparel(): Builder =
-            {
-                ModalApparelEditor(settings, result, onClose)
-            }
+        fun apparel(): Builder = {
+            ModalApparelEditor(settings, result, onClose)
+        }
 
         /** The default photo editor. */
-        fun photo(): Builder =
-            {
-                ModalPhotoEditor(settings, result, onClose)
-            }
+        fun photo(): Builder = {
+            ModalPhotoEditor(settings, result, onClose)
+        }
 
         /** The default video editor. */
-        fun video(): Builder =
-            {
-                ModalVideoEditor(settings, result, onClose)
-            }
+        fun video(): Builder = {
+            ModalVideoEditor(settings, result, onClose)
+        }
 
         /**
          * A custom editor implementation.
          * @param contentProvider A closure to provide a custom view.
          * @return A [Builder] providing the custom view.
          */
-        fun custom(contentProvider: @Composable CustomBuilderScope.() -> Unit): Builder =
-            {
-                val scope = CustomBuilderScope(settings, preset, metadata, result, onClose)
-                scope.contentProvider()
-            }
+        fun custom(contentProvider: @Composable CustomBuilderScope.() -> Unit): Builder = {
+            val scope = CustomBuilderScope(settings, preset, metadata, result, onClose)
+            scope.contentProvider()
+        }
 
         @Composable
         private fun ModalPhotoEditor(
@@ -108,30 +102,28 @@ class EditorBuilder {
             result: EditorBuilderResult,
             onClose: (Throwable?) -> Unit,
         ) {
-            val engineConfiguration =
-                EngineConfiguration.remember(
-                    license = settings.license,
-                    baseUri = Uri.parse(settings.baseUri),
-                    userId = settings.userId,
-                    onCreate = {
-                        EditorBuilderDefaults.onCreate(
-                            engine = editorContext.engine,
-                            eventHandler = editorContext.eventHandler,
-                            settings = settings,
-                            defaultScene = EditorBuilderDefaults.defaultPhotoUri,
-                            sourceType = EditorSourceType.IMAGE,
-                        )
-                    },
-                    onExport = {
-                        val export =
-                            EditorBuilderDefaults.onExport(
-                                engine = editorContext.engine,
-                                eventHandler = editorContext.eventHandler,
-                                mimeType = MimeType.PNG,
-                            )
-                        result(Result.success(export))
-                    },
-                )
+            val engineConfiguration = EngineConfiguration.remember(
+                license = settings.license,
+                baseUri = Uri.parse(settings.baseUri),
+                userId = settings.userId,
+                onCreate = {
+                    EditorBuilderDefaults.onCreate(
+                        engine = editorContext.engine,
+                        eventHandler = editorContext.eventHandler,
+                        settings = settings,
+                        defaultScene = EditorBuilderDefaults.defaultPhotoUri,
+                        sourceType = EditorSourceType.IMAGE,
+                    )
+                },
+                onExport = {
+                    val export = EditorBuilderDefaults.onExport(
+                        engine = editorContext.engine,
+                        eventHandler = editorContext.eventHandler,
+                        mimeType = MimeType.PNG,
+                    )
+                    result(Result.success(export))
+                },
+            )
             PhotoEditor(engineConfiguration = engineConfiguration) {
                 onClose(it)
             }
@@ -143,29 +135,27 @@ class EditorBuilder {
             result: EditorBuilderResult,
             onClose: (Throwable?) -> Unit,
         ) {
-            val engineConfiguration =
-                EngineConfiguration.remember(
-                    license = settings.license,
-                    baseUri = Uri.parse(settings.baseUri),
-                    userId = settings.userId,
-                    onCreate = {
-                        EditorBuilderDefaults.onCreate(
-                            engine = editorContext.engine,
-                            eventHandler = editorContext.eventHandler,
-                            settings = settings,
-                            defaultScene = EngineConfiguration.defaultApparelSceneUri,
-                        )
-                    },
-                    onExport = {
-                        val export =
-                            EditorBuilderDefaults.onExport(
-                                engine = editorContext.engine,
-                                eventHandler = editorContext.eventHandler,
-                                mimeType = MimeType.PDF,
-                            )
-                        result(Result.success(export))
-                    },
-                )
+            val engineConfiguration = EngineConfiguration.remember(
+                license = settings.license,
+                baseUri = Uri.parse(settings.baseUri),
+                userId = settings.userId,
+                onCreate = {
+                    EditorBuilderDefaults.onCreate(
+                        engine = editorContext.engine,
+                        eventHandler = editorContext.eventHandler,
+                        settings = settings,
+                        defaultScene = EngineConfiguration.defaultApparelSceneUri,
+                    )
+                },
+                onExport = {
+                    val export = EditorBuilderDefaults.onExport(
+                        engine = editorContext.engine,
+                        eventHandler = editorContext.eventHandler,
+                        mimeType = MimeType.PDF,
+                    )
+                    result(Result.success(export))
+                },
+            )
             ApparelEditor(engineConfiguration = engineConfiguration) {
                 onClose(it)
             }
@@ -177,29 +167,27 @@ class EditorBuilder {
             result: EditorBuilderResult,
             onClose: (Throwable?) -> Unit,
         ) {
-            val engineConfiguration =
-                EngineConfiguration.remember(
-                    license = settings.license,
-                    baseUri = Uri.parse(settings.baseUri),
-                    userId = settings.userId,
-                    onCreate = {
-                        EditorBuilderDefaults.onCreate(
-                            engine = editorContext.engine,
-                            eventHandler = editorContext.eventHandler,
-                            settings = settings,
-                            defaultScene = EngineConfiguration.defaultDesignSceneUri,
-                        )
-                    },
-                    onExport = {
-                        val export =
-                            EditorBuilderDefaults.onExport(
-                                engine = editorContext.engine,
-                                eventHandler = editorContext.eventHandler,
-                                mimeType = MimeType.PDF,
-                            )
-                        result(Result.success(export))
-                    },
-                )
+            val engineConfiguration = EngineConfiguration.remember(
+                license = settings.license,
+                baseUri = Uri.parse(settings.baseUri),
+                userId = settings.userId,
+                onCreate = {
+                    EditorBuilderDefaults.onCreate(
+                        engine = editorContext.engine,
+                        eventHandler = editorContext.eventHandler,
+                        settings = settings,
+                        defaultScene = EngineConfiguration.defaultDesignSceneUri,
+                    )
+                },
+                onExport = {
+                    val export = EditorBuilderDefaults.onExport(
+                        engine = editorContext.engine,
+                        eventHandler = editorContext.eventHandler,
+                        mimeType = MimeType.PDF,
+                    )
+                    result(Result.success(export))
+                },
+            )
 
             DesignEditor(engineConfiguration = engineConfiguration) {
                 onClose(it)
@@ -212,29 +200,27 @@ class EditorBuilder {
             result: EditorBuilderResult,
             onClose: (Throwable?) -> Unit,
         ) {
-            val engineConfiguration =
-                EngineConfiguration.remember(
-                    license = settings.license,
-                    baseUri = Uri.parse(settings.baseUri),
-                    userId = settings.userId,
-                    onCreate = {
-                        EditorBuilderDefaults.onCreate(
-                            engine = editorContext.engine,
-                            eventHandler = editorContext.eventHandler,
-                            settings = settings,
-                            defaultScene = EngineConfiguration.defaultPostcardSceneUri,
-                        )
-                    },
-                    onExport = {
-                        val export =
-                            EditorBuilderDefaults.onExport(
-                                engine = editorContext.engine,
-                                eventHandler = editorContext.eventHandler,
-                                mimeType = MimeType.PDF,
-                            )
-                        result(Result.success(export))
-                    },
-                )
+            val engineConfiguration = EngineConfiguration.remember(
+                license = settings.license,
+                baseUri = Uri.parse(settings.baseUri),
+                userId = settings.userId,
+                onCreate = {
+                    EditorBuilderDefaults.onCreate(
+                        engine = editorContext.engine,
+                        eventHandler = editorContext.eventHandler,
+                        settings = settings,
+                        defaultScene = EngineConfiguration.defaultPostcardSceneUri,
+                    )
+                },
+                onExport = {
+                    val export = EditorBuilderDefaults.onExport(
+                        engine = editorContext.engine,
+                        eventHandler = editorContext.eventHandler,
+                        mimeType = MimeType.PDF,
+                    )
+                    result(Result.success(export))
+                },
+            )
 
             PostcardEditor(engineConfiguration = engineConfiguration) {
                 onClose(it)
@@ -247,37 +233,35 @@ class EditorBuilder {
             result: EditorBuilderResult,
             onClose: (Throwable?) -> Unit,
         ) {
-            val engineConfiguration =
-                EngineConfiguration.remember(
-                    license = settings.license,
-                    baseUri = Uri.parse(settings.baseUri),
-                    userId = settings.userId,
-                    onCreate = {
-                        EditorBuilderDefaults.onCreate(
+            val engineConfiguration = EngineConfiguration.remember(
+                license = settings.license,
+                baseUri = Uri.parse(settings.baseUri),
+                userId = settings.userId,
+                onCreate = {
+                    EditorBuilderDefaults.onCreate(
+                        engine = editorContext.engine,
+                        eventHandler = editorContext.eventHandler,
+                        settings = settings,
+                        defaultScene = EngineConfiguration.defaultVideoSceneUri,
+                    )
+                },
+                onExport = {
+                    try {
+                        val export = EditorBuilderDefaults.onExportVideo(
                             engine = editorContext.engine,
                             eventHandler = editorContext.eventHandler,
-                            settings = settings,
-                            defaultScene = EngineConfiguration.defaultVideoSceneUri,
+                            mimeType = MimeType.MP4,
                         )
-                    },
-                    onExport = {
-                        try {
-                            val export =
-                                EditorBuilderDefaults.onExportVideo(
-                                    engine = editorContext.engine,
-                                    eventHandler = editorContext.eventHandler,
-                                    mimeType = MimeType.MP4,
-                                )
-                            result(Result.success(export))
-                        } catch (e: Exception) {
-                            if (e !is CancellationException) {
-                                result(Result.failure(e))
-                            } else {
-                                editorContext.eventHandler.send(DismissVideoExportEvent)
-                            }
+                        result(Result.success(export))
+                    } catch (e: Exception) {
+                        if (e !is CancellationException) {
+                            result(Result.failure(e))
+                        } else {
+                            editorContext.eventHandler.send(DismissVideoExportEvent)
                         }
-                    },
-                )
+                    }
+                },
+            )
             VideoEditor(engineConfiguration = engineConfiguration) {
                 onClose(it)
             }
@@ -305,24 +289,22 @@ object EditorBuilderDefaults {
         defaultScene: Uri,
         sourceType: EditorSourceType = EditorSourceType.SCENE,
     ) = coroutineScope {
-        fun isValidUri(uri: Uri): Boolean =
-            try {
-                uri.scheme != null && uri.path != null
-            } catch (e: Exception) {
-                false
-            }
+        fun isValidUri(uri: Uri): Boolean = try {
+            uri.scheme != null && uri.path != null
+        } catch (e: Exception) {
+            false
+        }
 
-        val uri =
-            if (settings.source != null) {
-                val sourceUri = Uri.parse(settings.source?.source)
-                val isValid = isValidUri(sourceUri)
-                if (!isValid) {
-                    throw IllegalArgumentException("The specified source is not a valid Uri.")
-                }
-                sourceUri
-            } else {
-                defaultScene
+        val uri = if (settings.source != null) {
+            val sourceUri = Uri.parse(settings.source?.source)
+            val isValid = isValidUri(sourceUri)
+            if (!isValid) {
+                throw IllegalArgumentException("The specified source is not a valid Uri.")
             }
+            sourceUri
+        } else {
+            defaultScene
+        }
 
         when (settings.source?.type ?: sourceType) {
             EditorSourceType.IMAGE -> {
@@ -376,22 +358,20 @@ object EditorBuilderDefaults {
     ): EditorResult {
         EditorBuilderDefaults.run {
             eventHandler.send(ShowLoading)
-            val blob =
-                engine.block.export(
-                    block = requireNotNull(engine.scene.get()),
-                    mimeType = mimeType,
-                ) {
-                    scene.getPages().forEach {
-                        block.setScopeEnabled(it, key = "layer/visibility", enabled = true)
-                        block.setVisible(it, visible = true)
-                    }
+            val blob = engine.block.export(
+                block = requireNotNull(engine.scene.get()),
+                mimeType = mimeType,
+            ) {
+                scene.getPages().forEach {
+                    block.setScopeEnabled(it, key = "layer/visibility", enabled = true)
+                    block.setVisible(it, visible = true)
                 }
+            }
             val tempFile = EditorDefaults.writeToTempFile(blob, mimeType)
             val scene = engine.scene.get()
-            val sceneString =
-                scene?.let {
-                    engine.scene.saveToString(it)
-                }
+            val sceneString = scene?.let {
+                engine.scene.saveToString(it)
+            }
             val sceneUri = sceneString?.let { saveScene(it) }
             val firstPage = engine.scene.getPages().first()
             val thumbnail = saveThumbnail(firstPage, engine, thumbnailHeight)
@@ -425,23 +405,21 @@ object EditorBuilderDefaults {
             val page = engine.scene.getCurrentPage() ?: engine.scene.getPages().first()
             val thumbnail = saveThumbnail(page, engine, thumbnailHeight)
             val scene = engine.scene.get()
-            val sceneString =
-                scene?.let {
-                    engine.scene.saveToString(it)
-                }
+            val sceneString = scene?.let {
+                engine.scene.saveToString(it)
+            }
 
-            val buffer =
-                engine.block.exportVideo(
-                    block = page,
-                    timeOffset = 0.0,
-                    duration = engine.block.getDuration(page),
-                    mimeType = mimeType,
-                    progressCallback = { progress ->
-                        eventHandler.send(
-                            ShowVideoExportProgressEvent(progress.encodedFrames.toFloat() / progress.totalFrames),
-                        )
-                    },
-                )
+            val buffer = engine.block.exportVideo(
+                block = page,
+                timeOffset = 0.0,
+                duration = engine.block.getDuration(page),
+                mimeType = mimeType,
+                progressCallback = { progress ->
+                    eventHandler.send(
+                        ShowVideoExportProgressEvent(progress.encodedFrames.toFloat() / progress.totalFrames),
+                    )
+                },
+            )
 
             val tempFile = EditorDefaults.writeToTempFile(buffer, mimeType)
             eventHandler.send(DismissVideoExportEvent)
@@ -454,22 +432,19 @@ object EditorBuilderDefaults {
         }
     }
 
-    private suspend fun saveScene(scene: String): Uri =
-        withContext(Dispatchers.IO) {
-            val file =
-                File
-                    .createTempFile("cesdk_export_scene_" + UUID.randomUUID().toString(), ".scene")
-            file.writeText(scene)
-            Uri.fromFile(file)
-        }
+    private suspend fun saveScene(scene: String): Uri = withContext(Dispatchers.IO) {
+        val file = File
+            .createTempFile("cesdk_export_scene_" + UUID.randomUUID().toString(), ".scene")
+        file.writeText(scene)
+        Uri.fromFile(file)
+    }
 
     private suspend fun saveThumbnail(
         id: DesignBlock,
         engine: Engine,
         height: Int,
     ): Uri {
-        val frames =
-            engine.block.generateVideoThumbnailSequence(id, height, timeBegin = 0.0, timeEnd = 0.1, numberOfFrames = 1).toList()
+        val frames = engine.block.generateVideoThumbnailSequence(id, height, timeBegin = 0.0, timeEnd = 0.1, numberOfFrames = 1).toList()
         val firstFrame = frames.first()
         val buffer = firstFrame.imageData
         val tempFile = EditorDefaults.writeToTempFile(buffer, MimeType.PNG)
