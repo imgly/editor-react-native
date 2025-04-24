@@ -1,6 +1,8 @@
 package ly.img.editor.reactnative.module.builder
 
+import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.Composable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -30,10 +32,12 @@ import ly.img.engine.DemoAssetSource
 import ly.img.engine.DesignBlock
 import ly.img.engine.DesignBlockType
 import ly.img.engine.Engine
+import ly.img.engine.FillType
 import ly.img.engine.MimeType
 import ly.img.engine.addDefaultAssetSources
 import ly.img.engine.addDemoAssetSources
 import java.io.File
+import java.io.FileOutputStream
 import java.util.UUID
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -370,10 +374,15 @@ object EditorBuilderDefaults {
             val tempFile = EditorDefaults.writeToTempFile(blob, mimeType)
             val scene = engine.scene.get()
             val sceneString = scene?.let {
-                engine.scene.saveToString(it)
+                checkForContentUris(engine)
+                engine.scene.saveToString(
+                    scene = it,
+                    allowedResourceSchemes = listOf("blob", "bundle", "file", "http", "https", "content"),
+                )
             }
             val sceneUri = sceneString?.let { saveScene(it) }
             val firstPage = engine.scene.getPages().first()
+            engine.block.setVisible(firstPage, true)
             val thumbnail = saveThumbnail(firstPage, engine, thumbnailHeight)
             eventHandler.send(HideLoading)
             return EditorResult(
@@ -406,7 +415,11 @@ object EditorBuilderDefaults {
             val thumbnail = saveThumbnail(page, engine, thumbnailHeight)
             val scene = engine.scene.get()
             val sceneString = scene?.let {
-                engine.scene.saveToString(it)
+                checkForContentUris(engine)
+                engine.scene.saveToString(
+                    scene = it,
+                    allowedResourceSchemes = listOf("blob", "bundle", "file", "http", "https", "content"),
+                )
             }
 
             val buffer = engine.block.exportVideo(
@@ -447,7 +460,55 @@ object EditorBuilderDefaults {
         val frames = engine.block.generateVideoThumbnailSequence(id, height, timeBegin = 0.0, timeEnd = 0.1, numberOfFrames = 1).toList()
         val firstFrame = frames.first()
         val buffer = firstFrame.imageData
-        val tempFile = EditorDefaults.writeToTempFile(buffer, MimeType.PNG)
-        return Uri.fromFile(tempFile)
+        val bitmap = Bitmap.createBitmap(firstFrame.width, firstFrame.height, Bitmap.Config.ARGB_8888)
+        buffer.rewind()
+        bitmap.copyPixelsFromBuffer(buffer)
+        return withContext(Dispatchers.IO) {
+            val file = File.createTempFile(UUID.randomUUID().toString(), ".png")
+            FileOutputStream(file).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+            Uri.fromFile(file)
+        }
+    }
+
+    private fun checkForContentUris(engine: Engine) = runCatching {
+        fun isContentUri(uri: String) = uri.startsWith("content://")
+
+        val graphicBlocks = engine.block.findByType(DesignBlockType.Graphic)
+        for (block in graphicBlocks) {
+            val fill = if (engine.block.supportsFill(block)) {
+                engine.block.getFill(block).takeIf { engine.block.isValid(it) }
+            } else {
+                null
+            }
+            fill ?: continue
+            val fillType = FillType.get(engine.block.getType(fill))
+            val contentUriFound = when (fillType) {
+                FillType.Image -> {
+                    isContentUri(engine.block.getString(fill, "fill/image/imageFileURI")) ||
+                        isContentUri(engine.block.getString(fill, "fill/image/previewFileURI"))
+                }
+                FillType.Video -> {
+                    isContentUri(engine.block.getString(fill, "fill/video/fileURI"))
+                }
+                else -> continue
+            }
+            if (contentUriFound) {
+                Log.w(
+                    "IMG.LY",
+                    """
+                    This scene contains block(s) that reference `content://` Uri(s) 
+                    (e.g. when media is picked from gallery or camera). These may not be 
+                    resolvable when loading the scene again, especially outside the 
+                    original app context. If you need to support reloading such scenes, 
+                    consider using a custom implementation with 
+                    `EngineConfiguration.onUpload` and `engine.editor.setUriResolver` 
+                    to handle these Uri(s) appropriately.
+                    """.trimIndent(),
+                )
+                break
+            }
+        }
     }
 }

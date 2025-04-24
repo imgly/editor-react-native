@@ -24,7 +24,16 @@ export enum EditorPreset {
  * information.
  */
 export interface EditorResult {
-  /** The scene. */
+  /** The scene.
+   * ⚠️ On Android, this scene might contain blocks that reference
+   * `content://` Uri(s) (e.g. when media is picked from gallery or camera).
+   * These may not be resolvable when loading the scene again, especially
+   * outside the original app context.
+   *
+   * If you need to support reloading such scenes, consider using a custom
+   * implementation with `EngineConfiguration.onUpload` and
+   * `engine.editor.setUriResolver` to handle these Uri(s) appropriately.
+   */
   scene?: string;
 
   /** The path of the exported image/video/pdf. */

@@ -21,6 +21,7 @@ public extension OnExport {
 
     var thumbnail: URL?
     if let firstPage = try engine.scene.getPages().first {
+      try engine.block.setVisible(firstPage, visible: true)
       thumbnail = try await helper.saveThumbnail(firstPage, engine, thumbnailHeight)
     }
     return EditorResult(

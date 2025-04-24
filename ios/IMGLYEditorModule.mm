@@ -37,13 +37,9 @@ RCT_EXPORT_MODULE(IMGLYEditor)
   return std::make_shared<facebook::react::NativeIMGLYEditorSpecJSI>(params);
 }
 #else
-RCT_EXPORT_METHOD(openEditor
-                  : (nonnull NSDictionary*)settings source
-                  : (nullable NSDictionary*)source preset
-                  : (NSString*)preset metadata
-                  : (NSDictionary*)metadata resolve
-                  : (RCTPromiseResolveBlock)resolve reject
-                  : (RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(openEditor : (nonnull NSDictionary*)settings source : (nullable NSDictionary*)
+                    source preset : (NSString*)preset metadata : (NSDictionary*)
+                      metadata resolve : (RCTPromiseResolveBlock)resolve reject : (RCTPromiseRejectBlock)reject) {
   NSMutableDictionary* mergedSettings = [settings mutableCopy];
   mergedSettings[@"source"] = source;
   [self open:mergedSettings preset:preset metadata:metadata resolve:resolve reject:reject];
