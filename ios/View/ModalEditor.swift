@@ -22,33 +22,21 @@ public struct ModalEditor<Editor: View, Label: View>: View {
     self.onDismiss = onDismiss
   }
 
-  @State private var isBackButtonHidden = false
-  @Environment(\.dismiss) private var dismiss
-
-  @ViewBuilder private var dismissButton: some View {
-    Button {
-      onDismiss(true)
-    } label: {
-      dismissLabel()
-    }
-  }
-
+  /// The body.
   public var body: some View {
     NavigationView {
       editor()
-        .onPreferenceChange(BackButtonHiddenKey.self) { newValue in
-          isBackButtonHidden = newValue
-        }
-        .toolbar {
-          ToolbarItem(placement: .navigationBarLeading) {
-            if !isBackButtonHidden {
-              dismissButton
-            }
+        .imgly.modifyNavigationBarItems { _, items in
+          items.replace(id: NavigationBar.Buttons.ID.closeEditor) {
+            NavigationBar.Buttons.closeEditor(
+              action: { _ in onDismiss(true) },
+              label: { _ in dismissLabel() }
+            )
           }
         }
-        .onDisappear(perform: {
+        .onDisappear {
           onDismiss(false)
-        })
+        }
     }
     .navigationViewStyle(.stack)
   }

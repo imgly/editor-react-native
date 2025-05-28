@@ -337,7 +337,12 @@ object EditorBuilderDefaults {
             val baseUri = Uri.parse(if (isValid) assetBaseUri else "https://cdn.img.ly/assets/v3")
             engine.addDefaultAssetSources(baseUri = baseUri)
             val excluded = setOf(DemoAssetSource.IMAGE, DemoAssetSource.VIDEO, DemoAssetSource.AUDIO)
-            engine.addDemoAssetSources(sceneMode = engine.scene.getMode(), withUploadAssetSources = true, exclude = excluded)
+            engine.addDemoAssetSources(
+                sceneMode = engine.scene.getMode(),
+                withUploadAssetSources = true,
+                exclude = excluded,
+                baseUri = Uri.parse("https://cdn.img.ly/assets/demo/v2"),
+            )
             val defaultTypeface = TypefaceProvider().provideTypeface(engine, "Roboto")
             requireNotNull(defaultTypeface)
             engine.asset.addSource(TextAssetSource(engine, defaultTypeface))
