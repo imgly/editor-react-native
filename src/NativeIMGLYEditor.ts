@@ -92,7 +92,7 @@ export class EditorSettingsModel implements EditorSettings {
    * as relative paths.
    */
   sceneBaseUri: string =
-    'https://cdn.img.ly/packages/imgly/cesdk-engine/1.35.0/assets';
+    'https://cdn.img.ly/packages/imgly/cesdk-engine/1.51.0/assets';
 
   /** The base URI to the default assets of the asset library. */
   assetBaseUri?: string;
