@@ -120,12 +120,16 @@ class EditorBuilder {
                     )
                 },
                 onExport = {
-                    val export = EditorBuilderDefaults.onExport(
-                        engine = editorContext.engine,
-                        eventHandler = editorContext.eventHandler,
-                        mimeType = MimeType.PNG,
-                    )
-                    result(Result.success(export))
+                    try {
+                        val export = EditorBuilderDefaults.onExport(
+                            engine = editorContext.engine,
+                            eventHandler = editorContext.eventHandler,
+                            mimeType = MimeType.PNG,
+                        )
+                        result(Result.success(export))
+                    } catch (e: Exception) {
+                        result(Result.failure(e))
+                    }
                 },
             )
             PhotoEditor(engineConfiguration = engineConfiguration) {
@@ -152,12 +156,16 @@ class EditorBuilder {
                     )
                 },
                 onExport = {
-                    val export = EditorBuilderDefaults.onExport(
-                        engine = editorContext.engine,
-                        eventHandler = editorContext.eventHandler,
-                        mimeType = MimeType.PDF,
-                    )
-                    result(Result.success(export))
+                    try {
+                        val export = EditorBuilderDefaults.onExport(
+                            engine = editorContext.engine,
+                            eventHandler = editorContext.eventHandler,
+                            mimeType = MimeType.PDF,
+                        )
+                        result(Result.success(export))
+                    } catch (e: Exception) {
+                        result(Result.failure(e))
+                    }
                 },
             )
             ApparelEditor(engineConfiguration = engineConfiguration) {
@@ -184,12 +192,16 @@ class EditorBuilder {
                     )
                 },
                 onExport = {
-                    val export = EditorBuilderDefaults.onExport(
-                        engine = editorContext.engine,
-                        eventHandler = editorContext.eventHandler,
-                        mimeType = MimeType.PDF,
-                    )
-                    result(Result.success(export))
+                    try {
+                        val export = EditorBuilderDefaults.onExport(
+                            engine = editorContext.engine,
+                            eventHandler = editorContext.eventHandler,
+                            mimeType = MimeType.PDF,
+                        )
+                        result(Result.success(export))
+                    } catch (e: Exception) {
+                        result(Result.failure(e))
+                    }
                 },
             )
 
@@ -217,12 +229,16 @@ class EditorBuilder {
                     )
                 },
                 onExport = {
-                    val export = EditorBuilderDefaults.onExport(
-                        engine = editorContext.engine,
-                        eventHandler = editorContext.eventHandler,
-                        mimeType = MimeType.PDF,
-                    )
-                    result(Result.success(export))
+                    try {
+                        val export = EditorBuilderDefaults.onExport(
+                            engine = editorContext.engine,
+                            eventHandler = editorContext.eventHandler,
+                            mimeType = MimeType.PDF,
+                        )
+                        result(Result.success(export))
+                    } catch (e: Exception) {
+                        result(Result.failure(e))
+                    }
                 },
             )
 
