@@ -48,12 +48,12 @@ data class EditorSettings(
 
         override fun newArray(size: Int): Array<EditorSettings?> = arrayOfNulls(size)
 
-        fun createFromMap(map: Map<String, Any>): EditorSettings? = try {
+        fun createFromMap(map: Map<String, Any?>): EditorSettings? = try {
             val license = map["license"] as? String ?: throw (Exception("Missing value for key 'license.'"))
             val sceneBaseUri = map["sceneBaseUri"] as? String ?: throw (Exception("Missing value for key 'sceneBaseUri.'"))
             val assetBaseUri = map["assetBaseUri"] as? String
             val userId = map["userId"] as? String
-            val source = (map["source"] as? Map<String, Any>)?.let { Source.createFromMap(it) }
+            val source = (map["source"] as? Map<String, Any?>)?.let { Source.createFromMap(it) }
             EditorSettings(license, sceneBaseUri, assetBaseUri, userId, source)
         } catch (e: Exception) {
             null

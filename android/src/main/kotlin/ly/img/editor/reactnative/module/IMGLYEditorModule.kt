@@ -128,7 +128,7 @@ class IMGLYEditorModule(
     private fun openEditor(
         preset: EditorPreset?,
         config: EditorSettings,
-        metadata: Map<String, Any>?,
+        metadata: Map<String, Any?>?,
         completion: (Result<EditorResult?>) -> Unit,
     ) {
         val activity = this.currentActivity ?: return
