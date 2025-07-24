@@ -34,8 +34,8 @@ public struct ModalEditor<Editor: View, Label: View>: View {
             )
           }
         }
-        .onDisappear {
-          onDismiss(false)
+        .imgly.onError { error, eventHandler in
+          eventHandler.send(.showErrorAlert(error) { onDismiss(false) })
         }
     }
     .navigationViewStyle(.stack)

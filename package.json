@@ -1,6 +1,6 @@
 {
   "name": "@imgly/editor-react-native",
-  "version": "1.55.2",
+  "version": "1.56.0",
   "description": "CreativeEditor SDK for React Native - enable photo, video and design editing for your users on iOS and Android.",
   "react-native": "index.js",
   "source": "index.js",
