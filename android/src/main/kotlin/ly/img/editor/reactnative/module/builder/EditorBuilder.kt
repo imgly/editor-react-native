@@ -348,9 +348,9 @@ object EditorBuilderDefaults {
         }
 
         launch {
-            val assetBaseUri = settings.assetBaseUri ?: "https://cdn.img.ly/assets/v3"
+            val assetBaseUri = settings.assetBaseUri ?: "https://cdn.img.ly/assets/v4"
             val isValid = isValidUri(Uri.parse(assetBaseUri))
-            val baseUri = Uri.parse(if (isValid) assetBaseUri else "https://cdn.img.ly/assets/v3")
+            val baseUri = Uri.parse(if (isValid) assetBaseUri else "https://cdn.img.ly/assets/v4")
             engine.addDefaultAssetSources(baseUri = baseUri)
             val excluded = setOf(DemoAssetSource.IMAGE, DemoAssetSource.VIDEO, DemoAssetSource.AUDIO)
             engine.addDemoAssetSources(
