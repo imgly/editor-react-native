@@ -33,7 +33,7 @@ import UIKit
     _ preset: EditorPreset,
     settings: EditorSettings,
     metadata: [String: Any]?,
-    completion: @escaping (_ result: EditorResult?, _ error: NSError?) -> Void
+    completion: @escaping (_ result: EditorResult?, _ error: NSError?) -> Void,
   ) {
     _openEditor(preset, settings: settings, metadata: metadata, completion: completion)
   }
@@ -46,7 +46,7 @@ import UIKit
   public func openEditor(
     settings: EditorSettings,
     metadata: [String: Any]?,
-    completion: @escaping (_ result: EditorResult?, _ error: NSError?) -> Void
+    completion: @escaping (_ result: EditorResult?, _ error: NSError?) -> Void,
   ) {
     _openEditor(nil, settings: settings, metadata: metadata, completion: completion)
   }
@@ -55,7 +55,7 @@ import UIKit
     _ preset: EditorPreset?,
     settings: EditorSettings,
     metadata: [String: Any]?,
-    completion: @escaping (_ result: EditorResult?, _ error: NSError?) -> Void
+    completion: @escaping (_ result: EditorResult?, _ error: NSError?) -> Void,
   ) {
     let builder = builderClosure?(preset, metadata) ?? builderForPreset(preset)
     // Assign the `currentResultHandler` in order to manage the calls to the completion handler.

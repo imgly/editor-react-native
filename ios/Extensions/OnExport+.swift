@@ -27,7 +27,7 @@ public extension OnExport {
     return EditorResult(
       scene: localScene?.absoluteString,
       artifact: file.absoluteString,
-      thumbnail: thumbnail?.absoluteString
+      thumbnail: thumbnail?.absoluteString,
     )
   }
 
@@ -43,7 +43,7 @@ public extension OnExport {
     _ engine: Engine,
     _ eventHandler: EditorEventHandler,
     _ mimeType: MIMEType,
-    _ thumbnailHeight: CGFloat = 100
+    _ thumbnailHeight: CGFloat = 100,
   ) async throws -> EditorResult {
     let helper = ExportHelper()
     let (data, type) = try await OnExport.exportVideo(engine, eventHandler, mimeType: mimeType)
@@ -59,7 +59,7 @@ public extension OnExport {
     return EditorResult(
       scene: localScene?.absoluteString,
       artifact: file.absoluteString,
-      thumbnail: thumbnail?.absoluteString
+      thumbnail: thumbnail?.absoluteString,
     )
   }
 }

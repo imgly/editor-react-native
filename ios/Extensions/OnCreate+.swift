@@ -14,7 +14,7 @@ extension OnCreate {
   public static func load(
     _ settings: EditorSettings?,
     _ sourceType: EditorSourceType = .scene,
-    defaultSource: URL? = nil
+    defaultSource: URL? = nil,
   ) -> OnCreate.Callback {
     { engine in
       var url: URL?
@@ -33,11 +33,6 @@ extension OnCreate {
         switch settings?.source?.type ?? sourceType {
         case .image:
           try await engine.scene.create(fromImage: url)
-          let pages = try engine.scene.getPages()
-          let images = try engine.block.find(byType: .graphic)
-          guard let image = images.first, let page = pages.first else { throw "Scene could not be loaded." }
-          try engine.block.setFill(page, fill: engine.block.getFill(image))
-          try engine.block.destroy(image)
         case .video:
           try await engine.scene.create(fromVideo: url)
         default:
@@ -67,7 +62,7 @@ extension OnCreate {
       try await engine.addDemoAssetSources(
         exclude: [.image, .video, .audio],
         sceneMode: engine.scene.getMode(),
-        withUploadAssetSources: true
+        withUploadAssetSources: true,
       )
       try await engine.asset.addSource(TextAssetSource(engine: engine))
     }

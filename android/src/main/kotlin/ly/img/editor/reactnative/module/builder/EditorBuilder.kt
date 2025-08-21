@@ -329,14 +329,6 @@ object EditorBuilderDefaults {
         when (settings.source?.type ?: sourceType) {
             EditorSourceType.IMAGE -> {
                 engine.scene.createFromImage(uri)
-                val graphicBlocks = engine.block.findByType(DesignBlockType.Graphic)
-                require(graphicBlocks.size == 1) { "No image found." }
-                val graphicBlock = graphicBlocks[0]
-                val pages = engine.scene.getPages()
-                require(pages.size == 1) { "No image found." }
-                val page = pages[0]
-                engine.block.setFill(page, engine.block.getFill(graphicBlock))
-                engine.block.destroy(graphicBlock)
             }
             EditorSourceType.VIDEO -> {
                 engine.scene.createFromVideo(uri)

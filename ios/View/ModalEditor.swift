@@ -30,7 +30,7 @@ public struct ModalEditor<Editor: View, Label: View>: View {
           items.replace(id: NavigationBar.Buttons.ID.closeEditor) {
             NavigationBar.Buttons.closeEditor(
               action: { _ in onDismiss(true) },
-              label: { _ in dismissLabel() }
+              label: { _ in dismissLabel() },
             )
           }
         }

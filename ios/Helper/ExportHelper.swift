@@ -57,7 +57,7 @@ class ExportHelper {
       id,
       thumbnailHeight: Int(height * UIScreen.main.scale),
       timeRange: 0 ... 0.1,
-      numberOfFrames: 1
+      numberOfFrames: 1,
     )
     for try await thumbnail in stream {
       return .init(cgImage: thumbnail.image, scale: UIScreen.main.scale, orientation: .up)
