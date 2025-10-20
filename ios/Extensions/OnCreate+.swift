@@ -65,6 +65,7 @@ extension OnCreate {
         withUploadAssetSources: true,
       )
       try await engine.asset.addSource(TextAssetSource(engine: engine))
+      try engine.asset.addSource(PhotoRollAssetSource(engine: engine))
     }
   }
 }
