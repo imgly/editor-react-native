@@ -1,6 +1,6 @@
 {
   "name": "@imgly/editor-react-native",
-  "version": "1.60.0",
+  "version": "1.61.0",
   "description": "CreativeEditor SDK for React Native - enable photo, video and design editing for your users on iOS and Android.",
   "react-native": "index.js",
   "source": "index.js",
@@ -31,6 +31,9 @@
   "author": "IMG.LY GmbH",
   "license": "SEE LICENSE IN LICENSE.md",
   "homepage": "https://img.ly",
+  "resolutions": {
+    "debug": "^4.0.0 <4.4.2 || >4.4.2"
+  },
   "peerDependencies": {
     "react": "*",
     "react-native": "*"
