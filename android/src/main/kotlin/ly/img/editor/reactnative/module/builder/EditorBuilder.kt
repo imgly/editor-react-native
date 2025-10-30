@@ -21,6 +21,7 @@ import ly.img.editor.PostcardEditor
 import ly.img.editor.ShowLoading
 import ly.img.editor.ShowVideoExportProgressEvent
 import ly.img.editor.VideoEditor
+import ly.img.editor.core.engine.addSystemGalleryAssetSources
 import ly.img.editor.core.event.EditorEventHandler
 import ly.img.editor.core.library.data.TextAssetSource
 import ly.img.editor.core.library.data.TypefaceProvider
@@ -344,6 +345,7 @@ object EditorBuilderDefaults {
             val isValid = isValidUri(Uri.parse(assetBaseUri))
             val baseUri = Uri.parse(if (isValid) assetBaseUri else "https://cdn.img.ly/assets/v4")
             engine.addDefaultAssetSources(baseUri = baseUri)
+            engine.addSystemGalleryAssetSources()
             val excluded = setOf(DemoAssetSource.IMAGE, DemoAssetSource.VIDEO, DemoAssetSource.AUDIO)
             engine.addDemoAssetSources(
                 sceneMode = engine.scene.getMode(),
