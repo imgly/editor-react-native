@@ -131,7 +131,7 @@ class IMGLYEditorModule(
         metadata: Map<String, Any?>?,
         completion: (Result<EditorResult?>) -> Unit,
     ) {
-        val activity = this.currentActivity ?: return
+        val activity = this.reactApplicationContext.currentActivity ?: return
         this.completion = completion
 
         val intent = Intent(activity, EditorActivity::class.java).apply {

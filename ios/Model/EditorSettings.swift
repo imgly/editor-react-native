@@ -1,7 +1,7 @@
 /// A struct containing all necessary settings to setup the editor.
 @objc @objcMembers public class EditorSettings: NSObject, Codable {
-  /// The license key.
-  public let license: String
+  /// The license key. Pass `nil` to run the SDK in evaluation mode with a watermark.
+  public let license: String?
 
   /// The base uri for the assets included in the scene that have a relative source.
   public let sceneBaseUri: String

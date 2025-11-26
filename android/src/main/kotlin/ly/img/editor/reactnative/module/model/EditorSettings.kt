@@ -5,14 +5,14 @@ import android.os.Parcelable
 
 /**
  * A class containing all necessary information to configure an editor.
- * @property license The license key.
+ * @property license The license key. Pass `null` to run the SDK in evaluation mode with a watermark.
  * @property baseUri The base uri for the assets included in the scene that have a relative source.
  * @property assetBaseUri The base uri of the default assets in the asset library.
  * @property userId The id of the current user.
  * @property source The source to load into the editor.
  */
 data class EditorSettings(
-    val license: String,
+    val license: String? = null,
     val baseUri: String,
     val assetBaseUri: String?,
     val userId: String?,
@@ -23,7 +23,7 @@ data class EditorSettings(
      * @param parcel The [Parcel].
      */
     constructor(parcel: Parcel) : this(
-        parcel.readString() ?: throw (Exception("Missing value for key 'license.'")),
+        parcel.readString(),
         parcel.readString() ?: throw (Exception("Missing value for key 'baseUri.'")),
         parcel.readString(),
         parcel.readString(),
@@ -49,7 +49,7 @@ data class EditorSettings(
         override fun newArray(size: Int): Array<EditorSettings?> = arrayOfNulls(size)
 
         fun createFromMap(map: Map<String, Any?>): EditorSettings? = try {
-            val license = map["license"] as? String ?: throw (Exception("Missing value for key 'license.'"))
+            val license = map["license"] as? String
             val sceneBaseUri = map["sceneBaseUri"] as? String ?: throw (Exception("Missing value for key 'sceneBaseUri.'"))
             val assetBaseUri = map["assetBaseUri"] as? String
             val userId = map["userId"] as? String

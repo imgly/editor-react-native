@@ -55,8 +55,8 @@ export interface EditorResult {
  * information needed by the editor to operate.
  */
 export interface EditorSettings {
-  /** The license of the editor. */
-  license: string;
+  /** The license of the editor. Pass `null` to run the SDK in evaluation mode with a watermark. */
+  license?: string;
 
   /**
    * The base URI to the assets included in
@@ -83,8 +83,8 @@ export interface EditorSettings {
  * information needed by the editor to operate.
  */
 export class EditorSettingsModel implements EditorSettings {
-  /** The license of the editor. */
-  license: string;
+  /** The license of the editor. Pass `null` to run the SDK in evaluation mode with a watermark. */
+  license?: string;
 
   /**
    * The base URI to the assets included in

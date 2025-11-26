@@ -8,7 +8,7 @@ Visit our [documentation](https://img.ly/docs/cesdk) for more tutorials on how t
 
 ## License
 
-The CreativeEditor SDK is a commercial product. To use it and get access you need to unlock the SDK with a license file. You can purchase a license at https://img.ly/pricing.
+The CreativeEditor SDK is a commercial product. You can purchase a license at https://img.ly/pricing. Alternatively, you can use `null` as the license parameter to run the SDK in evaluation mode with a watermark.
 
 ## Getting Started
 
