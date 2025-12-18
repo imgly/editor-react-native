@@ -160,6 +160,17 @@ const NativeModule = TurboModuleRegistry.get<Spec>(
 ) as Spec | null;
 
 /**
+ * Checks if the app is using the New Architecture (TurboModules or Bridgeless).
+ * @returns true if New Architecture is enabled, false for Bridge.
+ */
+function isNewArchitectureEnabled(): boolean {
+  const g = global as any;
+  // Check for TurboModules (Expo 51-52 / RN 0.74-0.76)
+  // Check for Bridgeless mode (Expo 53+ / RN 0.79+)
+  return g.__turboModuleProxy != null || g.RN$Bridgeless === true;
+}
+
+/**
  * Resolves assets that are imported via `require`.
  * @param assetSource The asset source, e.g. require('my-asset')
  * @returns The resolved URI.
@@ -189,15 +200,27 @@ class IMGLYEditor {
   ): Promise<EditorResult | null> {
     if (NativeModule == null) return null;
 
-    const modifiedSource =
-      source?.source != null
-        ? {
-            ...source,
-            source: resolveStaticAsset(source.source)
-          }
-        : source;
+    let modifiedSource: Source | undefined;
+    if (source?.source != null) {
+      modifiedSource = {
+        ...source,
+        source: resolveStaticAsset(source.source)
+      };
+    } else if (isNewArchitectureEnabled()) {
+      // iOS New Architecture: Pass empty object to ensure struct conversion is triggered.
+      // Passing undefined leaves the C++ struct with garbage memory in release builds.
+      // See: https://github.com/facebook/react-native/issues/49920
+      modifiedSource = {} as unknown as Source;
+    }
+    // iOS Bridge (Old Architecture): Pass undefined, which the bridge handles
+    // gracefully. Passing {} causes decoding errors.
 
-    return NativeModule.openEditor(settings, modifiedSource, preset, metadata);
+    return NativeModule.openEditor(
+      settings,
+      modifiedSource,
+      preset,
+      metadata
+    );
   }
 }
 

@@ -14,9 +14,11 @@ RCT_EXPORT_MODULE(IMGLYEditor)
            resolve:(RCTPromiseResolveBlock)resolve
             reject:(RCTPromiseRejectBlock)reject {
   NSMutableDictionary* mergedSettings = [@{
-    @"license" : settings.license(),
     @"sceneBaseUri" : settings.sceneBaseUri(),
   } mutableCopy];
+  if (settings.license() != nil) {
+    mergedSettings[@"license"] = settings.license();
+  }
   if (settings.assetBaseUri() != nil) {
     mergedSettings[@"assetBaseUri"] = settings.assetBaseUri();
   }
@@ -24,9 +26,10 @@ RCT_EXPORT_MODULE(IMGLYEditor)
     mergedSettings[@"userId"] = settings.userId();
   }
 
-  JS::NativeIMGLYEditor::Source* sourcePtr = &source;
-  if (sourcePtr != nullptr) {
-    mergedSettings[@"source"] = @{@"source" : source.source(), @"type" : source.type()};
+  NSString* sourceValue = source.source();
+  NSString* typeValue = source.type();
+  if (sourceValue != nil && typeValue != nil) {
+    mergedSettings[@"source"] = @{@"source" : sourceValue, @"type" : typeValue};
   }
 
   [self open:mergedSettings preset:preset metadata:metadata resolve:resolve reject:reject];
