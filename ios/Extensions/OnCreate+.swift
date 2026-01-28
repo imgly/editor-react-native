@@ -60,7 +60,6 @@ extension OnCreate {
       let baseURI = baseURL ?? Engine.assetBaseURL
       try await engine.addDefaultAssetSources(baseURL: baseURI)
       try await engine.addDemoAssetSources(
-        exclude: [.image, .video, .audio],
         sceneMode: engine.scene.getMode(),
         withUploadAssetSources: true,
       )

@@ -6,6 +6,16 @@ buildscript {
         google()
         gradlePluginPortal()
     }
+
+    dependencies {
+        if (rootProject.ext.has('kotlinVersion')) {
+            def kotlinVersion = rootProject.ext.get('kotlinVersion').toString()
+            def kotlinMajor = kotlinVersion.tokenize('.')[0].toInteger()
+            if (kotlinMajor >= 2) {
+                classpath "org.jetbrains.kotlin:compose-compiler-gradle-plugin:$kotlinVersion"
+            }
+        }
+    }
 }
 
 def isNewArchitectureEnabled() {
@@ -26,12 +36,60 @@ def isKotlin2OrHigher() {
     return false
 }
 
-def getComposeVersion() {
-    if (isKotlin2OrHigher()) {
-        def mainVersion = getKotlinVersion().split('-')[0]
-        return mainVersion
+def getKotlinCompilerExtensionVersion() {
+    // User override takes precedence
+    if (gradle.ext.has("kotlinCompilerExtensionVersion")) {
+        return gradle.ext.kotlinCompilerExtensionVersion
     }
-    return gradle.ext.has("kotlinCompilerExtensionVersion") ? gradle.ext.kotlinCompilerExtensionVersion : "1.5.10"
+
+    def kotlinVersion = getKotlinVersion()
+    if (!kotlinVersion) {
+        logger.warn("Could not detect Kotlin version - using Compose Compiler 1.5.10")
+        return "1.5.10"
+    }
+
+    def mainVersion = kotlinVersion.split('-')[0]
+
+    // Kotlin to Compose Compiler compatibility map (from developer.android.com)
+    def compatibilityMap = [
+        // Kotlin 1.9.x
+        "1.9.25": "1.5.15",
+        "1.9.24": "1.5.14",
+        "1.9.23": "1.5.13",
+        "1.9.22": "1.5.10",
+        "1.9.21": "1.5.7",
+        "1.9.20": "1.5.5",
+        "1.9.10": "1.5.3",
+        "1.9.0":  "1.5.2",
+        // Kotlin 1.8.x
+        "1.8.22": "1.4.8",
+        "1.8.21": "1.4.7",
+        "1.8.20": "1.4.6",
+        "1.8.10": "1.4.4",
+        "1.8.0":  "1.4.1",
+        // Kotlin 1.7.x
+        "1.7.21": "1.4.0-alpha02",
+        "1.7.20": "1.3.2",
+        "1.7.10": "1.3.1",
+        // Kotlin 1.6.x
+        "1.6.21": "1.2.0",
+        "1.6.20": "1.2.0-beta03",
+        "1.6.10": "1.1.1",
+        "1.6.0":  "1.1.0-rc02",
+        // Kotlin 1.5.x
+        "1.5.31": "1.0.5",
+        "1.5.30": "1.0.3",
+        "1.5.21": "1.0.2",
+        "1.5.10": "1.0.0",
+    ]
+
+    if (compatibilityMap.containsKey(mainVersion)) {
+        return compatibilityMap[mainVersion]
+    }
+
+    // Fallback for unknown versions
+    logger.warn("Unknown Kotlin version '$mainVersion' - using Compose Compiler 1.5.10")
+    return "1.5.10"
 }
 
 apply plugin: 'com.android.library'
@@ -71,8 +129,9 @@ android {
     }
 
     if (!isKotlin2OrHigher()) {
+        def composeVersion = getKotlinCompilerExtensionVersion()
         composeOptions {
-            kotlinCompilerExtensionVersion = getComposeVersion()
+            kotlinCompilerExtensionVersion = composeVersion
         }
     }
 }
@@ -83,7 +142,7 @@ repositories {
 }
 
 dependencies {
-    implementation findProject(":editor") ?: "ly.img:editor:1.66.0"
+    implementation findProject(":editor") ?: "ly.img:editor:1.67.0"
     implementation platform("androidx.compose:compose-bom:2023.05.01")
     implementation "androidx.activity:activity-compose:1.6.1"
     implementation "androidx.activity:activity:1.7.0"

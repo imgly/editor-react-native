@@ -32,7 +32,6 @@ import ly.img.editor.reactnative.module.model.EditorPreset
 import ly.img.editor.reactnative.module.model.EditorResult
 import ly.img.editor.reactnative.module.model.EditorSettings
 import ly.img.editor.reactnative.module.model.EditorSourceType
-import ly.img.engine.DemoAssetSource
 import ly.img.engine.DesignBlock
 import ly.img.engine.DesignBlockType
 import ly.img.engine.Engine
@@ -357,12 +356,10 @@ object EditorBuilderDefaults {
             ).forEach { type ->
                 engine.asset.addSource(SystemGalleryAssetSource(context, type))
             }
-            val excluded = setOf(DemoAssetSource.IMAGE, DemoAssetSource.VIDEO, DemoAssetSource.AUDIO)
             engine.addDemoAssetSources(
                 sceneMode = engine.scene.getMode(),
                 withUploadAssetSources = true,
-                exclude = excluded,
-                baseUri = Uri.parse("https://cdn.img.ly/assets/demo/v2"),
+                baseUri = Uri.parse("https://cdn.img.ly/assets/demo/v3"),
             )
             val defaultTypeface = TypefaceProvider().provideTypeface(engine, "Roboto")
             requireNotNull(defaultTypeface)
