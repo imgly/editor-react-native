@@ -14,13 +14,10 @@ RCT_EXPORT_MODULE(IMGLYEditor)
            resolve:(RCTPromiseResolveBlock)resolve
             reject:(RCTPromiseRejectBlock)reject {
   NSMutableDictionary* mergedSettings = [@{
-    @"sceneBaseUri" : settings.sceneBaseUri(),
+    @"baseUri" : settings.baseUri(),
   } mutableCopy];
   if (settings.license() != nil) {
     mergedSettings[@"license"] = settings.license();
-  }
-  if (settings.assetBaseUri() != nil) {
-    mergedSettings[@"assetBaseUri"] = settings.assetBaseUri();
   }
   if (settings.userId() != nil) {
     mergedSettings[@"userId"] = settings.userId();

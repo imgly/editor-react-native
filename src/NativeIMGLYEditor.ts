@@ -59,14 +59,18 @@ export interface EditorSettings {
   license?: string;
 
   /**
-   * The base URI to the assets included in
-   * the scene of which the sources are specified
-   * as relative paths.
+   * The base URI used by the engine for built-in assets like emoji and
+   * fallback fonts, and by the editor for its default and demo asset
+   * sources (stickers, filters, and more).
+   *
+   * By default, assets are loaded from the IMG.LY CDN at
+   * `https://cdn.img.ly/packages/imgly/cesdk-react-native/<version>/assets`.
+   * For production use, we recommend downloading the assets from
+   * `https://cdn.img.ly/packages/imgly/cesdk-react-native/<version>/imgly-assets.zip`,
+   * hosting them on your own server, and setting `baseUri` to your
+   * hosted location.
    */
-  sceneBaseUri: string;
-
-  /** The base URI to the default assets of the asset library. */
-  assetBaseUri?: string;
+  baseUri: string;
 
   /**
    * Unique ID tied to your application's user.
@@ -87,15 +91,12 @@ export class EditorSettingsModel implements EditorSettings {
   license?: string;
 
   /**
-   * The base URI to the assets included in
-   * the scene of which the sources are specified
-   * as relative paths.
+   * The base URI used by the engine for built-in assets like emoji and
+   * fallback fonts, and by the editor for its default and demo asset
+   * sources (stickers, filters, and more).
    */
-  sceneBaseUri: string =
-    'https://cdn.img.ly/packages/imgly/cesdk-engine/1.51.0/assets';
-
-  /** The base URI to the default assets of the asset library. */
-  assetBaseUri?: string;
+  baseUri: string =
+    'https://cdn.img.ly/packages/imgly/cesdk-react-native/1.69.0/assets';
 
   /**
    * Unique ID tied to your application's user.

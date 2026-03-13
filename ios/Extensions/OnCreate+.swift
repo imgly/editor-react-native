@@ -42,13 +42,13 @@ extension OnCreate {
         try await OnCreate.default(engine)
       }
 
-      var assetUrl: URL?
-      if let assetBaseUri = settings?.assetBaseUri {
-        if let temp = URL(string: assetBaseUri), temp.scheme != nil {
-          assetUrl = temp
+      var baseURL: URL?
+      if let baseUri = settings?.baseUri {
+        if let temp = URL(string: baseUri), temp.scheme != nil {
+          baseURL = temp
         }
       }
-      try await Self.loadDefaultAssets(baseURL: assetUrl)(engine)
+      try await Self.loadDefaultAssets(baseURL: baseURL)(engine)
     }
   }
 
@@ -60,6 +60,7 @@ extension OnCreate {
       let baseURI = baseURL ?? Engine.assetBaseURL
       try await engine.addDefaultAssetSources(baseURL: baseURI)
       try await engine.addDemoAssetSources(
+        baseURL: baseURI,
         sceneMode: engine.scene.getMode(),
         withUploadAssetSources: true,
       )

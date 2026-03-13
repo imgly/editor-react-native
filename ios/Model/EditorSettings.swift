@@ -3,11 +3,10 @@
   /// The license key. Pass `nil` to run the SDK in evaluation mode with a watermark.
   public let license: String?
 
-  /// The base uri for the assets included in the scene that have a relative source.
-  public let sceneBaseUri: String
-
-  /// The base uri of the default assets in the asset library.
-  public let assetBaseUri: String?
+  /// The base URI used by the engine for built-in assets like emoji and fallback
+  /// fonts, and by the editor for its default and demo asset sources (stickers,
+  /// filters, and more).
+  public let baseUri: String
 
   /// The id of the current user.
   public let userId: String?

@@ -103,7 +103,7 @@ extension EditorBuilder {
   /// - Parameter settings: The `EditorSettings`.
   /// - Returns: The derived `EngineSettings`.
   private static func engineSettings(for settings: EditorSettings) -> EngineSettings {
-    if let url = URL(string: settings.sceneBaseUri) {
+    if let url = URL(string: settings.baseUri) {
       EngineSettings(license: settings.license, userID: settings.userId, baseURL: url)
     } else {
       EngineSettings(license: settings.license, userID: settings.userId)

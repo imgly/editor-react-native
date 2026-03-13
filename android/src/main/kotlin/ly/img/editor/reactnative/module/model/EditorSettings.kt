@@ -6,15 +6,14 @@ import android.os.Parcelable
 /**
  * A class containing all necessary information to configure an editor.
  * @property license The license key. Pass `null` to run the SDK in evaluation mode with a watermark.
- * @property baseUri The base uri for the assets included in the scene that have a relative source.
- * @property assetBaseUri The base uri of the default assets in the asset library.
+ * @property baseUri The base URI used by the engine for built-in assets like emoji and fallback
+ *   fonts, and by the editor for its default and demo asset sources (stickers, filters, and more).
  * @property userId The id of the current user.
  * @property source The source to load into the editor.
  */
 data class EditorSettings(
     val license: String? = null,
     val baseUri: String,
-    val assetBaseUri: String?,
     val userId: String?,
     var source: Source?,
 ) : Parcelable {
@@ -26,7 +25,6 @@ data class EditorSettings(
         parcel.readString(),
         parcel.readString() ?: throw (Exception("Missing value for key 'baseUri.'")),
         parcel.readString(),
-        parcel.readString(),
         parcel.readParcelable(Source::class.java.classLoader),
     )
 
@@ -36,7 +34,6 @@ data class EditorSettings(
     ) {
         parcel.writeString(license)
         parcel.writeString(baseUri)
-        parcel.writeString(assetBaseUri)
         parcel.writeString(userId)
         parcel.writeParcelable(source, flags)
     }
@@ -50,11 +47,10 @@ data class EditorSettings(
 
         fun createFromMap(map: Map<String, Any?>): EditorSettings? = try {
             val license = map["license"] as? String
-            val sceneBaseUri = map["sceneBaseUri"] as? String ?: throw (Exception("Missing value for key 'sceneBaseUri.'"))
-            val assetBaseUri = map["assetBaseUri"] as? String
+            val baseUri = map["baseUri"] as? String ?: throw (Exception("Missing value for key 'baseUri.'"))
             val userId = map["userId"] as? String
             val source = (map["source"] as? Map<String, Any?>)?.let { Source.createFromMap(it) }
-            EditorSettings(license, sceneBaseUri, assetBaseUri, userId, source)
+            EditorSettings(license, baseUri, userId, source)
         } catch (e: Exception) {
             null
         }

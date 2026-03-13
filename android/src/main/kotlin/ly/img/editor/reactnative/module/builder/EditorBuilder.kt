@@ -343,9 +343,7 @@ object EditorBuilderDefaults {
         }
 
         launch {
-            val assetBaseUri = settings.assetBaseUri ?: "https://cdn.img.ly/assets/v4"
-            val isValid = isValidUri(Uri.parse(assetBaseUri))
-            val baseUri = Uri.parse(if (isValid) assetBaseUri else "https://cdn.img.ly/assets/v4")
+            val baseUri = Uri.parse(settings.baseUri)
             engine.addDefaultAssetSources(baseUri = baseUri)
             SystemGalleryPermission.setMode(SystemGalleryConfiguration.Disabled)
             val context = engine.applicationContext
@@ -359,7 +357,7 @@ object EditorBuilderDefaults {
             engine.addDemoAssetSources(
                 sceneMode = engine.scene.getMode(),
                 withUploadAssetSources = true,
-                baseUri = Uri.parse("https://cdn.img.ly/assets/demo/v3"),
+                baseUri = baseUri,
             )
             val defaultTypeface = TypefaceProvider().provideTypeface(engine, "Roboto")
             requireNotNull(defaultTypeface)
