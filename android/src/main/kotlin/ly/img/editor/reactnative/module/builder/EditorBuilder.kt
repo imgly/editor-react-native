@@ -386,12 +386,13 @@ object EditorBuilderDefaults {
             val blob = engine.block.export(
                 block = requireNotNull(engine.scene.get()),
                 mimeType = mimeType,
-            ) {
-                scene.getPages().forEach {
-                    block.setScopeEnabled(it, key = "layer/visibility", enabled = true)
-                    block.setVisible(it, visible = true)
-                }
-            }
+                onPreExport = {
+                    scene.getPages().forEach { page ->
+                        block.setScopeEnabled(page, key = "layer/visibility", enabled = true)
+                        block.setVisible(page, visible = true)
+                    }
+                },
+            )
             val tempFile = EditorDefaults.writeToTempFile(blob, mimeType)
             val scene = engine.scene.get()
             val sceneString = scene?.let {

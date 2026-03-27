@@ -96,7 +96,7 @@ export class EditorSettingsModel implements EditorSettings {
    * sources (stickers, filters, and more).
    */
   baseUri: string =
-    'https://cdn.img.ly/packages/imgly/cesdk-react-native/1.69.0/assets';
+    'https://cdn.img.ly/packages/imgly/cesdk-react-native/1.71.0/assets';
 
   /**
    * Unique ID tied to your application's user.
