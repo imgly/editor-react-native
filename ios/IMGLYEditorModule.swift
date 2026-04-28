@@ -1,6 +1,7 @@
 import UIKit
 
 /// The iOS implementation for the `@imgly/editor-react-native` React Native module.
+@MainActor
 @objc(IMGLYEditorModuleSwiftAdapter) @objcMembers public class IMGLYEditorModuleSwiftAdapter: NSObject {
   // MARK: - Typealias
 

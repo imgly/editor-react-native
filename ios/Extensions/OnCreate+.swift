@@ -2,70 +2,46 @@ import Foundation
 import IMGLYEditor
 import IMGLYEngine
 
-/// An extension that provides convenience methods for `OnCreate` calls.
-extension OnCreate {
-  /// Populates the editor based on a given `config`, `sourceType` and `defaultScene`.
-  /// - Parameters:
-  ///   - settings: The `EditorSettings` containing the relevant editor information.
-  ///   - sourceType: The `EditorSourceType` defining of which type the source is.
-  ///   - defaultSource: The `URL` of the defaultScene if no `EditorSettings.source` is specified.
-  /// - Returns: An `OnCreate.Callback`.
-  @MainActor
-  public static func load(
+// MARK: - React Native Source Loading
+
+public extension OnCreate {
+  /// Loads a source from React Native editor settings.
+  ///
+  /// This helper is designed to be used as the `createScene` parameter of starter kit
+  /// `defaultOnCreate` callbacks. It resolves the source URL from settings and loads it
+  /// based on the specified source type.
+  ///
+  /// ## Example
+  /// ```swift
+  /// builder.onCreate { engine, _ in
+  ///   if let createScene = try OnCreate.loadFromSettings(settings) {
+  ///     try await DesignEditorConfiguration.defaultOnCreate(createScene: createScene)(engine)
+  ///   } else {
+  ///     try await DesignEditorConfiguration.defaultOnCreate()(engine)
+  ///   }
+  /// }
+  /// ```
+  ///
+  /// - Parameter settings: The `EditorSettings` containing the source configuration from React Native.
+  /// - Returns: An `OnCreate.Callback` that loads the source, or `nil` if no source is specified
+  ///   (allowing the starter kit's default scene to be used instead).
+  /// - Throws: If a source is specified but its URL is invalid.
+  static func loadFromSettings(
     _ settings: EditorSettings?,
-    _ sourceType: EditorSourceType = .scene,
-    defaultSource: URL? = nil,
-  ) -> OnCreate.Callback {
-    { engine in
-      var url: URL?
-
-      if let source = settings?.source?.source {
-        if let sourceUrl = URL(string: source), sourceUrl.scheme != nil {
-          url = sourceUrl
-        } else {
-          throw "Specified URL is not valid."
-        }
-      } else if let defaultSource {
-        url = defaultSource
-      }
-
-      if let url {
-        switch settings?.source?.type ?? sourceType {
-        case .image:
-          try await engine.scene.create(fromImage: url)
-        case .video:
-          try await engine.scene.create(fromVideo: url)
-        default:
-          try await engine.scene.load(from: url)
-        }
-      } else {
-        try await OnCreate.default(engine)
-      }
-
-      var baseURL: URL?
-      if let baseUri = settings?.baseUri {
-        if let temp = URL(string: baseUri), temp.scheme != nil {
-          baseURL = temp
-        }
-      }
-      try await Self.loadDefaultAssets(baseURL: baseURL)(engine)
+  ) throws -> Callback? {
+    guard let source = settings?.source else { return nil }
+    guard let url = source.url else {
+      throw "Specified URL is not valid: \(source.source)"
     }
-  }
-
-  /// Loads the default assets for the asset library.
-  /// - Parameter baseURL: The base `URL` from your CDN where the assets are hosted.
-  /// - Returns: A `Callback`.
-  static func loadDefaultAssets(baseURL: URL?) -> Callback {
-    { engine in
-      let baseURI = baseURL ?? Engine.assetBaseURL
-      try await engine.addDefaultAssetSources(baseURL: baseURI)
-      try await engine.addDemoAssetSources(
-        baseURL: baseURI,
-        sceneMode: engine.scene.getMode(),
-        withUploadAssetSources: true,
-      )
-      try await engine.asset.addSource(TextAssetSource(engine: engine))
-      try engine.asset.addSource(PhotoRollAssetSource(engine: engine))
+    return { engine in
+      switch source.type {
+      case .image:
+        try await engine.scene.create(fromImage: url)
+      case .video:
+        try await engine.scene.create(fromVideo: url)
+      case .scene:
+        try await engine.scene.load(from: url)
+      }
     }
   }
 }

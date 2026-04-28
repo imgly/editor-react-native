@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import ly.img.editor.reactnative.module.IMGLYEditorModule
 import ly.img.editor.reactnative.module.builder.Builder
 import ly.img.editor.reactnative.module.builder.CustomBuilderScope
@@ -43,6 +44,7 @@ class EditorActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         val config = intent.extras?.getParcelableCompat<EditorSettings>(INTENT_EXTRA_CONFIG) ?: return
         val preset = intent.extras?.getParcelableCompat<EditorPreset>(INTENT_EXTRA_PRESET) ?: EditorPreset.DESIGN

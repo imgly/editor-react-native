@@ -4,30 +4,31 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.core.graphics.createBitmap
+import androidx.core.net.toUri
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ly.img.editor.ApparelEditor
-import ly.img.editor.DesignEditor
-import ly.img.editor.DismissVideoExportEvent
-import ly.img.editor.EditorDefaults
-import ly.img.editor.EngineConfiguration
-import ly.img.editor.HideLoading
-import ly.img.editor.PhotoEditor
-import ly.img.editor.PostcardEditor
-import ly.img.editor.ShowLoading
-import ly.img.editor.ShowVideoExportProgressEvent
-import ly.img.editor.VideoEditor
-import ly.img.editor.core.event.EditorEventHandler
-import ly.img.editor.core.library.data.AssetSourceType
-import ly.img.editor.core.library.data.SystemGalleryAssetSource
-import ly.img.editor.core.library.data.SystemGalleryConfiguration
-import ly.img.editor.core.library.data.SystemGalleryPermission
-import ly.img.editor.core.library.data.TextAssetSource
-import ly.img.editor.core.library.data.TypefaceProvider
+import ly.img.editor.Editor
+import ly.img.editor.configuration.apparel.ApparelConfigurationBuilder
+import ly.img.editor.configuration.apparel.callback.onCreate
+import ly.img.editor.configuration.apparel.callback.onExport
+import ly.img.editor.configuration.design.DesignConfigurationBuilder
+import ly.img.editor.configuration.design.callback.onCreate
+import ly.img.editor.configuration.design.callback.onExport
+import ly.img.editor.configuration.photo.PhotoConfigurationBuilder
+import ly.img.editor.configuration.photo.callback.onCreate
+import ly.img.editor.configuration.photo.callback.onExport
+import ly.img.editor.configuration.postcard.PostcardConfigurationBuilder
+import ly.img.editor.configuration.postcard.callback.onCreate
+import ly.img.editor.configuration.postcard.callback.onExport
+import ly.img.editor.configuration.video.VideoConfigurationBuilder
+import ly.img.editor.configuration.video.callback.onCreate
+import ly.img.editor.configuration.video.callback.onExport
+import ly.img.editor.core.EditorScope
+import ly.img.editor.core.configuration.EditorConfiguration
+import ly.img.editor.core.configuration.remember
 import ly.img.editor.reactnative.module.model.EditorPreset
 import ly.img.editor.reactnative.module.model.EditorResult
 import ly.img.editor.reactnative.module.model.EditorSettings
@@ -36,13 +37,10 @@ import ly.img.engine.DesignBlock
 import ly.img.engine.DesignBlockType
 import ly.img.engine.Engine
 import ly.img.engine.FillType
-import ly.img.engine.MimeType
-import ly.img.engine.addDefaultAssetSources
-import ly.img.engine.addDemoAssetSources
 import java.io.File
 import java.io.FileOutputStream
+import java.nio.ByteBuffer
 import java.util.UUID
-import kotlin.coroutines.cancellation.CancellationException
 
 /** A closure used to return a [Result] with type [EditorResult] from the editor. */
 typealias EditorBuilderResult = (Result<EditorResult?>) -> Unit
@@ -109,33 +107,41 @@ class EditorBuilder {
             result: EditorBuilderResult,
             onClose: (Throwable?) -> Unit,
         ) {
-            val engineConfiguration = EngineConfiguration.remember(
+            Editor(
                 license = settings.license,
-                baseUri = Uri.parse(settings.baseUri),
+                baseUri = settings.baseUri.toUri(),
                 userId = settings.userId,
-                onCreate = {
-                    EditorBuilderDefaults.onCreate(
-                        engine = editorContext.engine,
-                        eventHandler = editorContext.eventHandler,
-                        settings = settings,
-                        defaultScene = EditorBuilderDefaults.defaultPhotoUri,
-                        sourceType = EditorSourceType.IMAGE,
-                    )
-                },
-                onExport = {
-                    try {
-                        val export = EditorBuilderDefaults.onExport(
-                            engine = editorContext.engine,
-                            eventHandler = editorContext.eventHandler,
-                            mimeType = MimeType.PNG,
-                        )
-                        result(Result.success(export))
-                    } catch (e: Exception) {
-                        result(Result.failure(e))
+                configuration = {
+                    EditorConfiguration.remember(::PhotoConfigurationBuilder) {
+                        onCreate = {
+                            onCreate(
+                                createScene = {
+                                    EditorBuilderDefaults.onCreateScene(
+                                        scope = this@Editor,
+                                        settings = settings,
+                                        defaultUri = EditorBuilderDefaults.defaultPhotoUri,
+                                        sourceType = EditorSourceType.IMAGE,
+                                    )
+                                },
+                            )
+                        }
+                        onExport = {
+                            onExport(
+                                postExport = {
+                                    val result = EditorBuilderDefaults.getExportResult(
+                                        scope = this@Editor,
+                                        byteBuffer = it,
+                                    )
+                                    result(Result.success(result))
+                                },
+                                error = {
+                                    result(Result.failure(it))
+                                },
+                            )
+                        }
                     }
                 },
-            )
-            PhotoEditor(engineConfiguration = engineConfiguration) {
+            ) {
                 onClose(it)
             }
         }
@@ -146,32 +152,40 @@ class EditorBuilder {
             result: EditorBuilderResult,
             onClose: (Throwable?) -> Unit,
         ) {
-            val engineConfiguration = EngineConfiguration.remember(
+            Editor(
                 license = settings.license,
-                baseUri = Uri.parse(settings.baseUri),
+                baseUri = settings.baseUri.toUri(),
                 userId = settings.userId,
-                onCreate = {
-                    EditorBuilderDefaults.onCreate(
-                        engine = editorContext.engine,
-                        eventHandler = editorContext.eventHandler,
-                        settings = settings,
-                        defaultScene = EngineConfiguration.defaultApparelSceneUri,
-                    )
-                },
-                onExport = {
-                    try {
-                        val export = EditorBuilderDefaults.onExport(
-                            engine = editorContext.engine,
-                            eventHandler = editorContext.eventHandler,
-                            mimeType = MimeType.PDF,
-                        )
-                        result(Result.success(export))
-                    } catch (e: Exception) {
-                        result(Result.failure(e))
+                configuration = {
+                    EditorConfiguration.remember(::ApparelConfigurationBuilder) {
+                        onCreate = {
+                            onCreate(
+                                createScene = {
+                                    EditorBuilderDefaults.onCreateScene(
+                                        scope = this@Editor,
+                                        settings = settings,
+                                        defaultUri = "file:///android_asset/scene/apparel.scene".toUri(),
+                                    )
+                                },
+                            )
+                        }
+                        onExport = {
+                            onExport(
+                                postExport = {
+                                    val result = EditorBuilderDefaults.getExportResult(
+                                        scope = this@Editor,
+                                        byteBuffer = it,
+                                    )
+                                    result(Result.success(result))
+                                },
+                                error = {
+                                    result(Result.failure(it))
+                                },
+                            )
+                        }
                     }
                 },
-            )
-            ApparelEditor(engineConfiguration = engineConfiguration) {
+            ) {
                 onClose(it)
             }
         }
@@ -182,33 +196,40 @@ class EditorBuilder {
             result: EditorBuilderResult,
             onClose: (Throwable?) -> Unit,
         ) {
-            val engineConfiguration = EngineConfiguration.remember(
+            Editor(
                 license = settings.license,
-                baseUri = Uri.parse(settings.baseUri),
+                baseUri = settings.baseUri.toUri(),
                 userId = settings.userId,
-                onCreate = {
-                    EditorBuilderDefaults.onCreate(
-                        engine = editorContext.engine,
-                        eventHandler = editorContext.eventHandler,
-                        settings = settings,
-                        defaultScene = EngineConfiguration.defaultDesignSceneUri,
-                    )
-                },
-                onExport = {
-                    try {
-                        val export = EditorBuilderDefaults.onExport(
-                            engine = editorContext.engine,
-                            eventHandler = editorContext.eventHandler,
-                            mimeType = MimeType.PDF,
-                        )
-                        result(Result.success(export))
-                    } catch (e: Exception) {
-                        result(Result.failure(e))
+                configuration = {
+                    EditorConfiguration.remember(::DesignConfigurationBuilder) {
+                        onCreate = {
+                            onCreate(
+                                createScene = {
+                                    EditorBuilderDefaults.onCreateScene(
+                                        scope = this@Editor,
+                                        settings = settings,
+                                        defaultUri = "file:///android_asset/scene/design.scene".toUri(),
+                                    )
+                                },
+                            )
+                        }
+                        onExport = {
+                            onExport(
+                                postExport = {
+                                    val result = EditorBuilderDefaults.getExportResult(
+                                        scope = this@Editor,
+                                        byteBuffer = it,
+                                    )
+                                    result(Result.success(result))
+                                },
+                                error = {
+                                    result(Result.failure(it))
+                                },
+                            )
+                        }
                     }
                 },
-            )
-
-            DesignEditor(engineConfiguration = engineConfiguration) {
+            ) {
                 onClose(it)
             }
         }
@@ -219,33 +240,40 @@ class EditorBuilder {
             result: EditorBuilderResult,
             onClose: (Throwable?) -> Unit,
         ) {
-            val engineConfiguration = EngineConfiguration.remember(
+            Editor(
                 license = settings.license,
-                baseUri = Uri.parse(settings.baseUri),
+                baseUri = settings.baseUri.toUri(),
                 userId = settings.userId,
-                onCreate = {
-                    EditorBuilderDefaults.onCreate(
-                        engine = editorContext.engine,
-                        eventHandler = editorContext.eventHandler,
-                        settings = settings,
-                        defaultScene = EngineConfiguration.defaultPostcardSceneUri,
-                    )
-                },
-                onExport = {
-                    try {
-                        val export = EditorBuilderDefaults.onExport(
-                            engine = editorContext.engine,
-                            eventHandler = editorContext.eventHandler,
-                            mimeType = MimeType.PDF,
-                        )
-                        result(Result.success(export))
-                    } catch (e: Exception) {
-                        result(Result.failure(e))
+                configuration = {
+                    EditorConfiguration.remember(::PostcardConfigurationBuilder) {
+                        onCreate = {
+                            onCreate(
+                                createScene = {
+                                    EditorBuilderDefaults.onCreateScene(
+                                        scope = this@Editor,
+                                        settings = settings,
+                                        defaultUri = "file:///android_asset/scene/postcard.scene".toUri(),
+                                    )
+                                },
+                            )
+                        }
+                        onExport = {
+                            onExport(
+                                postExport = {
+                                    val result = EditorBuilderDefaults.getExportResult(
+                                        scope = this@Editor,
+                                        byteBuffer = it,
+                                    )
+                                    result(Result.success(result))
+                                },
+                                error = {
+                                    result(Result.failure(it))
+                                },
+                            )
+                        }
                     }
                 },
-            )
-
-            PostcardEditor(engineConfiguration = engineConfiguration) {
+            ) {
                 onClose(it)
             }
         }
@@ -256,36 +284,44 @@ class EditorBuilder {
             result: EditorBuilderResult,
             onClose: (Throwable?) -> Unit,
         ) {
-            val engineConfiguration = EngineConfiguration.remember(
+            Editor(
                 license = settings.license,
-                baseUri = Uri.parse(settings.baseUri),
+                baseUri = settings.baseUri.toUri(),
                 userId = settings.userId,
-                onCreate = {
-                    EditorBuilderDefaults.onCreate(
-                        engine = editorContext.engine,
-                        eventHandler = editorContext.eventHandler,
-                        settings = settings,
-                        defaultScene = EngineConfiguration.defaultVideoSceneUri,
-                    )
-                },
-                onExport = {
-                    try {
-                        val export = EditorBuilderDefaults.onExportVideo(
-                            engine = editorContext.engine,
-                            eventHandler = editorContext.eventHandler,
-                            mimeType = MimeType.MP4,
-                        )
-                        result(Result.success(export))
-                    } catch (e: Exception) {
-                        if (e !is CancellationException) {
-                            result(Result.failure(e))
-                        } else {
-                            editorContext.eventHandler.send(DismissVideoExportEvent)
+                configuration = {
+                    EditorConfiguration.remember(::VideoConfigurationBuilder) {
+                        onCreate = {
+                            onCreate(
+                                createScene = {
+                                    EditorBuilderDefaults.onCreateScene(
+                                        scope = this@Editor,
+                                        settings = settings,
+                                        defaultUri = "file:///android_asset/scene/video.scene".toUri(),
+                                    )
+                                },
+                            )
+                        }
+                        onExport = {
+                            onExport(
+                                postExport = {
+                                    val result = EditorBuilderDefaults.getExportResult(
+                                        scope = this@Editor,
+                                        byteBuffer = it,
+                                    )
+                                    exportStatus = null
+                                    result(Result.success(result))
+                                },
+                                error = {
+                                    exportStatus = null
+                                    if (it !is CancellationException) {
+                                        result(Result.failure(it))
+                                    }
+                                },
+                            )
                         }
                     }
                 },
-            )
-            VideoEditor(engineConfiguration = engineConfiguration) {
+            ) {
                 onClose(it)
             }
         }
@@ -295,181 +331,97 @@ class EditorBuilder {
 /** Default implementations to ease the editor configuration process. */
 object EditorBuilderDefaults {
     /** The default image uri for the photo editor. */
-    val defaultPhotoUri: Uri = Uri.parse("file:///android_asset/photo-ui-empty.png")
+    val defaultPhotoUri: Uri = "file:///android_asset/photo-ui-empty.png".toUri()
 
     /**
-     * Default plugin implementation for the *onCreate* callback.
-     * @param engine The [Engine] that should be used.
-     * @param eventHandler The [EditorEventHandler] that should be used.
-     * @param settings The [EditorSettings] containing the relevant editor information.
-     * @param defaultScene The [Uri] of the defaultScene if no [EditorSettings.source] is specified.
-     * @param sourceType The [EditorSourceType] defining of which type the source is.
+     * Default plugin implementation for the scene creation part of the *onCreate* callback.
+     *
+     * @param scope the [EditorScope] of the editor.
+     * @param settings the [EditorSettings] containing the relevant editor information.
+     * @param defaultUri the default source [Uri] if no [EditorSettings.source] is specified.
+     * @param sourceType the [EditorSourceType] defining of which type the source is.
      */
-    suspend fun onCreate(
-        engine: Engine,
-        eventHandler: EditorEventHandler,
+    suspend fun onCreateScene(
+        scope: EditorScope,
         settings: EditorSettings,
-        defaultScene: Uri,
+        defaultUri: Uri,
         sourceType: EditorSourceType = EditorSourceType.SCENE,
-    ) = coroutineScope {
+    ) = scope.run {
+        editorContext.engine.scene.get()?.let { return@run it }
+
         fun isValidUri(uri: Uri): Boolean = try {
             uri.scheme != null && uri.path != null
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
 
-        val uri = if (settings.source != null) {
-            val sourceUri = Uri.parse(settings.source?.source)
+        val source = settings.source
+        val uri = if (source != null) {
+            val sourceUri = source.source.toUri()
             val isValid = isValidUri(sourceUri)
             if (!isValid) {
                 throw IllegalArgumentException("The specified source is not a valid Uri.")
             }
             sourceUri
         } else {
-            defaultScene
+            defaultUri
         }
 
         when (settings.source?.type ?: sourceType) {
             EditorSourceType.IMAGE -> {
-                engine.scene.createFromImage(uri)
+                editorContext.engine.scene.createFromImage(uri)
             }
             EditorSourceType.VIDEO -> {
-                engine.scene.createFromVideo(uri)
+                editorContext.engine.scene.createFromVideo(uri)
             }
-
             else -> {
-                engine.scene.load(uri)
+                editorContext.engine.scene.load(uri)
             }
         }
-
-        launch {
-            val baseUri = Uri.parse(settings.baseUri)
-            engine.addDefaultAssetSources(baseUri = baseUri)
-            SystemGalleryPermission.setMode(SystemGalleryConfiguration.Disabled)
-            val context = engine.applicationContext
-            listOf(
-                AssetSourceType.GalleryAllVisuals,
-                AssetSourceType.GalleryImage,
-                AssetSourceType.GalleryVideo,
-            ).forEach { type ->
-                engine.asset.addSource(SystemGalleryAssetSource(context, type))
-            }
-            engine.addDemoAssetSources(
-                sceneMode = engine.scene.getMode(),
-                withUploadAssetSources = true,
-                baseUri = baseUri,
-            )
-            val defaultTypeface = TypefaceProvider().provideTypeface(engine, "Roboto")
-            requireNotNull(defaultTypeface)
-            engine.asset.addSource(TextAssetSource(engine, defaultTypeface))
-        }
-        coroutineContext[Job]?.invokeOnCompletion {
-            eventHandler.send(HideLoading)
-        }
+        requireNotNull(editorContext.engine.scene.get())
     }
 
     /**
-     * Default plugin implementation for the *onExport* callback.
-     * @param engine The [Engine] that should be used.
-     * @param eventHandler The [EditorEventHandler] that should be used.
-     * @param mimeType The [MimeType] of the exported artifact.
-     * @param thumbnailHeight The height of the generated thumbnail.
+     * Default plugin implementation that returns [EditorResult] based on the exported [byteBuffer]
+     *
+     * @param scope the [EditorScope] of the editor.
+     * @param byteBuffer the buffer that contains the exported data.
+     * @param thumbnailHeight the height of the generated thumbnail.
+     * @return a new [EditorResult] that contains a uri to temporary file with [byteBuffer] content,
+     * thumbnail and an exported scene string.
      */
-    suspend fun onExport(
-        engine: Engine,
-        eventHandler: EditorEventHandler,
-        mimeType: MimeType,
+    suspend fun getExportResult(
+        scope: EditorScope,
+        byteBuffer: ByteBuffer,
         thumbnailHeight: Int = 100,
-    ): EditorResult {
-        EditorBuilderDefaults.run {
-            eventHandler.send(ShowLoading)
-            val blob = engine.block.export(
-                block = requireNotNull(engine.scene.get()),
-                mimeType = mimeType,
-                onPreExport = {
-                    scene.getPages().forEach { page ->
-                        block.setScopeEnabled(page, key = "layer/visibility", enabled = true)
-                        block.setVisible(page, visible = true)
-                    }
-                },
-            )
-            val tempFile = EditorDefaults.writeToTempFile(blob, mimeType)
-            val scene = engine.scene.get()
-            val sceneString = scene?.let {
-                checkForContentUris(engine)
-                engine.scene.saveToString(
-                    scene = it,
-                    allowedResourceSchemes = listOf("blob", "bundle", "file", "http", "https", "content"),
-                )
-            }
-            val sceneUri = sceneString?.let { saveScene(it) }
-            val firstPage = engine.scene.getPages().first()
-            engine.block.setVisible(firstPage, true)
-            val thumbnail = saveThumbnail(firstPage, engine, thumbnailHeight)
-            eventHandler.send(HideLoading)
-            return EditorResult(
-                scene = sceneUri.toString(),
-                artifact = Uri.fromFile(tempFile).toString(),
-                thumbnail = thumbnail.toString(),
+    ) = scope.run {
+        val scene = editorContext.engine.scene.get()
+        val sceneString = scene?.let {
+            checkForContentUris(editorContext.engine)
+            editorContext.engine.scene.saveToString(
+                scene = it,
+                allowedResourceSchemes = listOf("blob", "bundle", "file", "http", "https", "content"),
             )
         }
+        val sceneUri = sceneString?.let { saveScene(it) }
+        val firstPage = editorContext.engine.scene.getPages().first()
+        editorContext.engine.block.setVisible(firstPage, visible = true)
+        val thumbnail = saveThumbnail(firstPage, editorContext.engine, thumbnailHeight)
+        EditorResult(
+            scene = sceneUri.toString(),
+            artifact = Uri.fromFile(byteBuffer.writeToFile()).toString(),
+            thumbnail = thumbnail.toString(),
+        )
     }
 
-    /**
-     * Default plugin implementation for the *onExport* callback for the video editor.
-     * @param engine The [Engine] that should be used.
-     * @param eventHandler The [EditorEventHandler] that should be used.
-     * @param mimeType The [MimeType] of the exported artifact.
-     * @param thumbnailHeight The height of the generated thumbnail.
-     */
-    suspend fun onExportVideo(
-        engine: Engine,
-        eventHandler: EditorEventHandler,
-        mimeType: MimeType,
-        thumbnailHeight: Int = 100,
-    ): EditorResult {
-        EditorBuilderDefaults.run {
-            eventHandler.send(ShowVideoExportProgressEvent(0f))
-
-            // First create the thumbnail and save the scene
-            // in order to finish before the video export sheet is done.
-            val page = engine.scene.getCurrentPage() ?: engine.scene.getPages().first()
-            val thumbnail = saveThumbnail(page, engine, thumbnailHeight)
-            val scene = engine.scene.get()
-            val sceneString = scene?.let {
-                checkForContentUris(engine)
-                engine.scene.saveToString(
-                    scene = it,
-                    allowedResourceSchemes = listOf("blob", "bundle", "file", "http", "https", "content"),
-                )
-            }
-
-            val buffer = engine.block.exportVideo(
-                block = page,
-                timeOffset = 0.0,
-                duration = engine.block.getDuration(page),
-                mimeType = mimeType,
-                progressCallback = { progress ->
-                    eventHandler.send(
-                        ShowVideoExportProgressEvent(progress.encodedFrames.toFloat() / progress.totalFrames),
-                    )
-                },
-            )
-
-            val tempFile = EditorDefaults.writeToTempFile(buffer, mimeType)
-            eventHandler.send(DismissVideoExportEvent)
-
-            return EditorResult(
-                scene = sceneString,
-                artifact = Uri.fromFile(tempFile).toString(),
-                thumbnail = thumbnail.toString(),
-            )
+    private suspend fun ByteBuffer.writeToFile(): File = withContext(Dispatchers.IO) {
+        File.createTempFile(UUID.randomUUID().toString(), ".tmp").apply {
+            outputStream().channel.write(this@writeToFile)
         }
     }
 
     private suspend fun saveScene(scene: String): Uri = withContext(Dispatchers.IO) {
-        val file = File
-            .createTempFile("cesdk_export_scene_" + UUID.randomUUID().toString(), ".scene")
+        val file = File.createTempFile("cesdk_export_scene_" + UUID.randomUUID().toString(), ".scene")
         file.writeText(scene)
         Uri.fromFile(file)
     }
@@ -479,13 +431,19 @@ object EditorBuilderDefaults {
         engine: Engine,
         height: Int,
     ): Uri {
-        val frames = engine.block.generateVideoThumbnailSequence(id, height, timeBegin = 0.0, timeEnd = 0.1, numberOfFrames = 1).toList()
+        val frames = engine.block.generateVideoThumbnailSequence(
+            block = id,
+            thumbnailHeight = height,
+            timeBegin = 0.0,
+            timeEnd = 0.1,
+            numberOfFrames = 1,
+        ).toList()
         val firstFrame = frames.first()
-        val buffer = firstFrame.imageData
-        val bitmap = Bitmap.createBitmap(firstFrame.width, firstFrame.height, Bitmap.Config.ARGB_8888)
-        buffer.rewind()
-        bitmap.copyPixelsFromBuffer(buffer)
         return withContext(Dispatchers.IO) {
+            val buffer = firstFrame.imageData
+            val bitmap = createBitmap(firstFrame.width, firstFrame.height)
+            buffer.rewind()
+            bitmap.copyPixelsFromBuffer(buffer)
             val file = File.createTempFile(UUID.randomUUID().toString(), ".png")
             FileOutputStream(file).use { out ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
