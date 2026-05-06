@@ -82,7 +82,15 @@ import UIKit
       .first as? UIWindowScene {
       if let rootViewController = windowScene.windows
         .filter(\.isKeyWindow).first?.rootViewController {
-        rootViewController.present(presentationController, animated: true, completion: nil)
+        // Walk up the presentation chain to the topmost view controller.
+        // Presenting on a VC that is already presenting another VC silently
+        // no-ops in UIKit, which leaves the SDK Promise hanging forever when
+        // the host app uses react-native-screens / Expo Router / RN <Modal>.
+        var topViewController: UIViewController = rootViewController
+        while let presented = topViewController.presentedViewController {
+          topViewController = presented
+        }
+        topViewController.present(presentationController, animated: true, completion: nil)
       }
     }
   }
