@@ -37,6 +37,7 @@ import ly.img.engine.DesignBlock
 import ly.img.engine.DesignBlockType
 import ly.img.engine.Engine
 import ly.img.engine.FillType
+import ly.img.engine.MimeType
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.ByteBuffer
@@ -131,6 +132,7 @@ class EditorBuilder {
                                     val result = EditorBuilderDefaults.getExportResult(
                                         scope = this@Editor,
                                         byteBuffer = it,
+                                        mimeType = MimeType.PNG,
                                     )
                                     result(Result.success(result))
                                 },
@@ -175,6 +177,7 @@ class EditorBuilder {
                                     val result = EditorBuilderDefaults.getExportResult(
                                         scope = this@Editor,
                                         byteBuffer = it,
+                                        mimeType = MimeType.PDF,
                                     )
                                     result(Result.success(result))
                                 },
@@ -219,6 +222,7 @@ class EditorBuilder {
                                     val result = EditorBuilderDefaults.getExportResult(
                                         scope = this@Editor,
                                         byteBuffer = it,
+                                        mimeType = MimeType.PDF,
                                     )
                                     result(Result.success(result))
                                 },
@@ -263,6 +267,7 @@ class EditorBuilder {
                                     val result = EditorBuilderDefaults.getExportResult(
                                         scope = this@Editor,
                                         byteBuffer = it,
+                                        mimeType = MimeType.PDF,
                                     )
                                     result(Result.success(result))
                                 },
@@ -307,6 +312,7 @@ class EditorBuilder {
                                     val result = EditorBuilderDefaults.getExportResult(
                                         scope = this@Editor,
                                         byteBuffer = it,
+                                        mimeType = MimeType.MP4,
                                     )
                                     exportStatus = null
                                     result(Result.success(result))
@@ -386,6 +392,7 @@ object EditorBuilderDefaults {
      *
      * @param scope the [EditorScope] of the editor.
      * @param byteBuffer the buffer that contains the exported data.
+     * @param mimeType the [MimeType] of the exported data, used to derive the artifact file extension.
      * @param thumbnailHeight the height of the generated thumbnail.
      * @return a new [EditorResult] that contains a uri to temporary file with [byteBuffer] content,
      * thumbnail and an exported scene string.
@@ -393,6 +400,7 @@ object EditorBuilderDefaults {
     suspend fun getExportResult(
         scope: EditorScope,
         byteBuffer: ByteBuffer,
+        mimeType: MimeType,
         thumbnailHeight: Int = 100,
     ) = scope.run {
         val scene = editorContext.engine.scene.get()
@@ -409,13 +417,14 @@ object EditorBuilderDefaults {
         val thumbnail = saveThumbnail(firstPage, editorContext.engine, thumbnailHeight)
         EditorResult(
             scene = sceneUri.toString(),
-            artifact = Uri.fromFile(byteBuffer.writeToFile()).toString(),
+            artifact = Uri.fromFile(byteBuffer.writeToFile(mimeType)).toString(),
             thumbnail = thumbnail.toString(),
         )
     }
 
-    private suspend fun ByteBuffer.writeToFile(): File = withContext(Dispatchers.IO) {
-        File.createTempFile(UUID.randomUUID().toString(), ".tmp").apply {
+    private suspend fun ByteBuffer.writeToFile(mimeType: MimeType): File = withContext(Dispatchers.IO) {
+        val extension = "." + mimeType.key.substringAfterLast('/')
+        File.createTempFile(UUID.randomUUID().toString(), extension).apply {
             outputStream().channel.write(this@writeToFile)
         }
     }
