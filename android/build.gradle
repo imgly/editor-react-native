@@ -96,6 +96,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.facebook.react'
 apply plugin: 'org.jetbrains.kotlin.android'
 
+def starterKitsGradleFilePath = "$projectDir/../../../../../../cesdk_android_showcases/starter-kits/starter-kits-local.gradle"
+if (file(starterKitsGradleFilePath).exists()) {
+    apply from: starterKitsGradleFilePath
+}
 
 if (isKotlin2OrHigher()) {
     try {
@@ -143,7 +147,7 @@ repositories {
 }
 
 dependencies {
-    api "ly.img:editor:1.76.0"
+    api "ly.img:editor:1.76.1"
 
     implementation "androidx.activity:activity-ktx:1.9.0"
     implementation "androidx.appcompat:appcompat:1.7.1"
