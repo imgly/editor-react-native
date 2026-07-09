@@ -191,10 +191,13 @@ extension EditorBuilder {
   /// - Parameter settings: The `EditorSettings`.
   /// - Returns: The derived `EngineSettings`.
   private static func engineSettings(for settings: EditorSettings) -> EngineSettings {
+    // Identify this engine as React-Native-hosted so v4 licenses scoped to
+    // `host: react-native` validate. Hardcoded (not customer-configurable).
+    let host = "react-native"
     if let url = URL(string: settings.baseUri) {
-      EngineSettings(license: settings.license, userID: settings.userId, baseURL: url)
+      return EngineSettings(license: settings.license, userID: settings.userId, baseURL: url, host: host)
     } else {
-      EngineSettings(license: settings.license, userID: settings.userId)
+      return EngineSettings(license: settings.license, userID: settings.userId, host: host)
     }
   }
 }

@@ -110,6 +110,7 @@ class EditorBuilder {
         ) {
             Editor(
                 license = settings.license,
+                host = "react-native",
                 baseUri = settings.baseUri.toUri(),
                 userId = settings.userId,
                 configuration = {
@@ -156,6 +157,7 @@ class EditorBuilder {
         ) {
             Editor(
                 license = settings.license,
+                host = "react-native",
                 baseUri = settings.baseUri.toUri(),
                 userId = settings.userId,
                 configuration = {
@@ -201,6 +203,7 @@ class EditorBuilder {
         ) {
             Editor(
                 license = settings.license,
+                host = "react-native",
                 baseUri = settings.baseUri.toUri(),
                 userId = settings.userId,
                 configuration = {
@@ -246,6 +249,7 @@ class EditorBuilder {
         ) {
             Editor(
                 license = settings.license,
+                host = "react-native",
                 baseUri = settings.baseUri.toUri(),
                 userId = settings.userId,
                 configuration = {
@@ -291,6 +295,7 @@ class EditorBuilder {
         ) {
             Editor(
                 license = settings.license,
+                host = "react-native",
                 baseUri = settings.baseUri.toUri(),
                 userId = settings.userId,
                 configuration = {
