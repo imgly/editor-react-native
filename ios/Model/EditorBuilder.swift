@@ -19,7 +19,7 @@ public enum EditorBuilder {
     _ settings: EditorSettings,
     _ preset: EditorPreset?,
     _ metadata: [String: Any]?,
-    _ result: @escaping EditorBuilderResult
+    _ result: @escaping EditorBuilderResult,
   ) -> UIViewController
 
   /// The default design editor.
@@ -99,7 +99,9 @@ public enum EditorBuilder {
                   let editorResult = try await OnExport.exportVideo(engine, eventHandler, .mp4)
                   result(.success(editorResult))
                 } catch {
-                  if error is CancellationError { return }
+                  if error is CancellationError {
+                    return
+                  }
                   result(.failure(error))
                 }
               }
@@ -175,11 +177,10 @@ public enum EditorBuilder {
     _ settings: EditorSettings,
     _ preset: EditorPreset?,
     _ metadata: [String: Any]?,
-    _ result: @escaping EditorBuilderResult
+    _ result: @escaping EditorBuilderResult,
   ) -> some View) -> Builder {
     { settings, preset, metadata, result in
-      let hostingController = UIHostingController(rootView: contentProvider(settings, preset, metadata, result))
-      return hostingController
+      UIHostingController(rootView: contentProvider(settings, preset, metadata, result))
     }
   }
 }

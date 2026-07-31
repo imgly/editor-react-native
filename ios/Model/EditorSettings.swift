@@ -22,8 +22,7 @@
   public static func fromDictionary(_ dictionary: [String: Any]) -> EditorSettings? {
     do {
       let data = try JSONSerialization.data(withJSONObject: dictionary, options: [])
-      let settings = try JSONDecoder().decode(EditorSettings.self, from: data)
-      return settings
+      return try JSONDecoder().decode(EditorSettings.self, from: data)
     } catch {
       print("Error decoding dictionary: \(error)")
       return nil
