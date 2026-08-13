@@ -96,7 +96,7 @@ export class EditorSettingsModel implements EditorSettings {
    * sources (stickers, filters, and more).
    */
   baseUri: string =
-    'https://cdn.img.ly/packages/imgly/cesdk-react-native/1.79.0/assets';
+    'https://cdn.img.ly/packages/imgly/cesdk-react-native/1.80.0/assets';
 
   /**
    * Unique ID tied to your application's user.
@@ -115,7 +115,7 @@ export class EditorSettingsModel implements EditorSettings {
  * loaded into the editor.
  */
 export enum SourceType {
-  /** A `.scene` file. */
+  /** A scene file (`.imgly` or the legacy `.scene`). */
   SCENE = 'scene',
 
   /** An image, e.g. `.png`. */
