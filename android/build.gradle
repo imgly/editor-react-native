@@ -96,6 +96,9 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.facebook.react'
 apply plugin: 'org.jetbrains.kotlin.android'
 
+// This module builds only the presets EditorBuilder exposes.
+ext.starterKitsInclude = ["apparel", "design", "photo", "postcard", "video"]
+
 
 if (isKotlin2OrHigher()) {
     try {
@@ -143,7 +146,7 @@ repositories {
 }
 
 dependencies {
-    api "ly.img:editor:1.79.0"
+    api "ly.img:editor:1.82.1-rc.1"
 
     implementation "androidx.activity:activity-ktx:1.9.0"
     implementation "androidx.appcompat:appcompat:1.7.1"
