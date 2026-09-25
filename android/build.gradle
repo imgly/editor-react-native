@@ -22,8 +22,27 @@ def isNewArchitectureEnabled() {
     return rootProject.hasProperty("newArchEnabled") && rootProject.getProperty("newArchEnabled") == "true"
 }
 
+// React Native modules are built with the host application's AGP. AGP 9 can
+// supply Kotlin itself, while older AGP versions require the Kotlin Gradle
+// Plugin.
+def isBuiltInKotlinEnabled() {
+    def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0].toInteger()
+    if (agpMajor < 9) {
+        return false
+    }
+
+    def propertyValue = providers.gradleProperty('android.builtInKotlin').orNull
+    return propertyValue == null || propertyValue.toBoolean()
+}
+
 def getKotlinVersion() {
-    return project.plugins.findPlugin("kotlin-android")?.class?.package?.implementationVersion
+    def kotlinAndroidPlugin = project.plugins.findPlugin("kotlin-android")
+    if (kotlinAndroidPlugin) {
+        return kotlinAndroidPlugin.class.package.implementationVersion
+    }
+
+    // AGP 9 supplies Kotlin 2+ when built-in Kotlin is enabled.
+    return isBuiltInKotlinEnabled() ? "2.0.0" : null
 }
 
 def isKotlin2OrHigher() {
@@ -94,7 +113,12 @@ def getKotlinCompilerExtensionVersion() {
 
 apply plugin: 'com.android.library'
 apply plugin: 'com.facebook.react'
-apply plugin: 'org.jetbrains.kotlin.android'
+if (!isBuiltInKotlinEnabled()) {
+    apply plugin: 'org.jetbrains.kotlin.android'
+}
+
+// This module builds only the presets EditorBuilder exposes.
+ext.starterKitsInclude = ["apparel", "design", "photo", "postcard", "video"]
 
 
 if (isKotlin2OrHigher()) {
@@ -106,21 +130,25 @@ if (isKotlin2OrHigher()) {
 }
 
 android {
-    compileSdkVersion safeExtGet('compileSdkVersion', 34)
+    compileSdkVersion safeExtGet('compileSdkVersion', 37)
 
     namespace "ly.img.editor.reactnative.module"
 
     defaultConfig {
         minSdk = 24
+        aarMetadata {
+            // AGP 9 defaults this to compileSdk; declare the consumer requirement separately.
+            minCompileSdk = 34
+        }
         buildConfigField("boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString())
     }
 
     sourceSets {
         main {
             if (isNewArchitectureEnabled()) {
-                java.srcDirs += ['src/newarch']
+                kotlin.srcDirs += ['src/newarch']
             } else {
-                java.srcDirs += ['src/oldarch']
+                kotlin.srcDirs += ['src/oldarch']
             }
         }
     }
@@ -129,7 +157,7 @@ android {
         compose true
     }
 
-    if (!isKotlin2OrHigher()) {
+    if (!isKotlin2OrHigher() && !isBuiltInKotlinEnabled()) {
         def composeVersion = getKotlinCompilerExtensionVersion()
         composeOptions {
             kotlinCompilerExtensionVersion = composeVersion
@@ -143,7 +171,7 @@ repositories {
 }
 
 dependencies {
-    api "ly.img:editor:1.79.0"
+    api "ly.img:editor:1.83.0-rc.2"
 
     implementation "androidx.activity:activity-ktx:1.9.0"
     implementation "androidx.appcompat:appcompat:1.7.1"
