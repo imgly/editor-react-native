@@ -97,6 +97,7 @@ suspend fun VideoConfigurationBuilder.onLoadAssetSources() {
             "ly.img.text.styles",
             "ly.img.text.curves",
             "ly.img.text.components",
+            "ly.img.caption.presets",
             "ly.img.image",
             "ly.img.audio",
             "ly.img.video",
@@ -109,13 +110,6 @@ suspend fun VideoConfigurationBuilder.onLoadAssetSources() {
             }
         }
     }
-
-    // Required for animations
-    editorContext.engine.block.setMetadata(
-        block = requireNotNull(editorContext.engine.scene.get()),
-        key = "ly.img.defaultAssetSourcesBaseUri",
-        value = editorContext.baseUri.toString(),
-    )
 
     // Load local asset sources
     editorContext.engine.asset.addLocalSource(
