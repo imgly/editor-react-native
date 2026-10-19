@@ -79,7 +79,12 @@ public extension VideoEditorConfiguration {
   /// Loads the built-in empty video scene.
   static let defaultCreateScene: OnCreate.Callback = { engine in
     // highlight-starter-kit-on-create-scene
-    let sceneURL = Bundle(for: VideoEditorConfiguration.self).url(forResource: "video-empty", withExtension: "scene")!
+    #if SWIFT_PACKAGE
+      let bundle = Bundle.module
+    #else
+      let bundle = Bundle(for: VideoEditorConfiguration.self)
+    #endif
+    let sceneURL = bundle.url(forResource: "video-empty", withExtension: "scene")!
     try await engine.scene.load(from: sceneURL)
     // highlight-starter-kit-on-create-scene
   }
@@ -93,7 +98,7 @@ public extension VideoEditorConfiguration {
       "ly.img.sticker", "ly.img.vector.shape", "ly.img.filter", "ly.img.color.palette",
       "ly.img.effect", "ly.img.blur", "ly.img.typeface", "ly.img.crop.presets",
       "ly.img.page.presets", "ly.img.text", "ly.img.text.styles", "ly.img.text.curves", "ly.img.text.components",
-      "ly.img.image", "ly.img.video", "ly.img.audio",
+      "ly.img.image", "ly.img.video", "ly.img.audio", "ly.img.caption.presets",
     ]
     try await withThrowingTaskGroup(of: String.self) { group in
       for id in sourceIDs {
