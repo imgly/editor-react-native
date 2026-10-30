@@ -1,6 +1,6 @@
 {
   "name": "@imgly/editor-react-native",
-  "version": "1.79.0",
+  "version": "1.85.1",
   "description": "CreativeEditor SDK for React Native - enable photo, video and design editing for your users on iOS and Android.",
   "react-native": "index.js",
   "source": "index.js",
@@ -45,5 +45,8 @@
     "android": {
       "javaPackageName": "ly.img.editor.reactnative.module"
     }
+  },
+  "swiftpmConfig": {
+    "name": "EditorReactNative"
   }
 }
