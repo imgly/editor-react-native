@@ -14,7 +14,9 @@ Pod::Spec.new do |s|
   s.source          = { path: './ios' }
 
   s.source_files = 'ios/**/*.{h,m,mm,swift}'
-  s.exclude_files = 'ios/StarterKits/**/*StarterKit.swift'
+  # ios/Package.swift is the manifest for React Native's experimental Swift
+  # Package Manager mode, not a source file.
+  s.exclude_files = ['ios/StarterKits/**/*StarterKit.swift', 'ios/Package.swift']
   s.resources = 'ios/StarterKits/*.{scene,png}'
 
   s.dependency 'IMGLYUI', s.version.to_s
