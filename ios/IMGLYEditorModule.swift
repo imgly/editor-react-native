@@ -69,7 +69,10 @@ import UIKit
       }
       // Remove the handler to prevent multiple invokations.
       self?.currentResultHandler = nil
-      self?.presentationController?.presentingViewController?.dismiss(animated: true)
+      // Release the editor, otherwise it stays alive and keeps playing until the next openEditor.
+      let controller = self?.presentationController
+      self?.presentationController = nil
+      controller?.presentingViewController?.dismiss(animated: true)
     }
 
     presentationController = builder(settings, preset, metadata) { [weak self] result in
