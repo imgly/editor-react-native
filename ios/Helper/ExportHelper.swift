@@ -22,7 +22,9 @@ class ExportHelper {
   /// - Returns: The file `URL`.
   func saveScene(_ scene: String) throws -> URL? {
     let fileName = "cesdk_export_scene_" + UUID().uuidString
-    let url = FileManager.default.temporaryDirectory.appendingPathComponent(fileName, conformingTo: .plainText)
+    let url = FileManager.default.temporaryDirectory
+      .appendingPathComponent(fileName)
+      .appendingPathExtension("imgly")
     if let data = scene.data(using: .utf8) {
       try data.write(to: url, options: [.atomic])
       return url
