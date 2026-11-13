@@ -1,3 +1,5 @@
+import Foundation
+
 /// An enum containing all prebuild editor configurations.
 @objc public enum EditorPreset: Int {
   /// The apparel editor.
