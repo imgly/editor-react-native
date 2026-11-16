@@ -1,3 +1,5 @@
+import Foundation
+
 /// A struct to declare a suitable source for the editor.
 public struct Source: Codable {
   /// The source to load into the editor.

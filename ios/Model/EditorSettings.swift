@@ -1,3 +1,5 @@
+import Foundation
+
 /// A struct containing all necessary settings to setup the editor.
 @objc @objcMembers public class EditorSettings: NSObject, Codable {
   /// The license key. Pass `nil` to run the SDK in evaluation mode with a watermark.

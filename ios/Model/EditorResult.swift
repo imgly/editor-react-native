@@ -1,3 +1,5 @@
+import Foundation
+
 /// A struct representing the result of an editor export.
 @objc @objcMembers public class EditorResult: NSObject {
   /// The source of the exported scene.

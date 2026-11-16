@@ -80,3 +80,10 @@ lib/
 # React Native Codegen
 ios/generated
 android/generated
+
+# SwiftPM artifacts — Package.swift makes ios/ a package root, so resolving it
+# or opening it in Xcode writes these next to the manifest. The Xcode `build/`
+# entry above does not match SwiftPM's `.build`.
+ios/.build/
+ios/.swiftpm/
+ios/Package.resolved

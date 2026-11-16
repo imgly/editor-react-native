@@ -45,11 +45,14 @@ suspend fun PhotoConfigurationBuilder.onCreate(
  * The callback that is invoked before the scene is created.
  */
 fun PhotoConfigurationBuilder.onPreCreateScene() {
+    editorContext.engine.editor.setSettingBoolean(keypath = "clip/defaultTransitionOverlapEnabled", value = false)
     showLoading = true
     editorContext.engine.editor.setSettingBoolean(keypath = "page/moveChildrenWhenCroppingFill", value = true)
     editorContext.engine.editor.setSettingBoolean(keypath = "page/selectWhenNoBlocksSelected", value = true)
     editorContext.engine.editor.setSettingBoolean(keypath = "page/highlightWhenCropping", value = true)
     editorContext.engine.editor.setSettingBoolean(keypath = "doubleClickToCropEnabled", value = false)
+    // Press and hold an image, then drag it onto another image to exchange the two.
+    editorContext.engine.editor.setSettingBoolean(keypath = "dragToSwapFills/enabled", value = true)
 }
 
 /**
