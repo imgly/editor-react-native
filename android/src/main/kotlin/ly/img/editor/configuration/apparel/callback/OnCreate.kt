@@ -50,11 +50,14 @@ suspend fun ApparelConfigurationBuilder.onCreate(
  * The callback that is invoked before the scene is created.
  */
 fun ApparelConfigurationBuilder.onPreCreateScene() {
+    editorContext.engine.editor.setSettingBoolean(keypath = "clip/defaultTransitionOverlapEnabled", value = false)
     showLoading = true
     editorContext.engine.editor.setSettingBoolean(
         keypath = "ubq://page/dimOutOfPageAreas",
         value = false,
     )
+    // Press and hold an image, then drag it onto another image to exchange the two.
+    editorContext.engine.editor.setSettingBoolean(keypath = "dragToSwapFills/enabled", value = true)
 }
 
 /**
