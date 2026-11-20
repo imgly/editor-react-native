@@ -42,6 +42,7 @@ public extension PhotoEditorConfiguration {
   ///
   /// Sets editor role, touch gestures, camera clamping, and global scopes.
   static let defaultPreCreateScene: OnCreate.Callback = { engine in
+    try engine.editor.setSettingBool("clip/defaultTransitionOverlapEnabled", value: false)
     try engine.editor.setRole("Adopter")
     try engine.editor.setSettingEnum("camera/clamping/overshootMode", value: "Center")
 
@@ -51,6 +52,9 @@ public extension PhotoEditorConfiguration {
     try engine.editor.setSettingBool("touch/dragStartCanSelect", value: false)
     try engine.editor.setSettingEnum("touch/pinchAction", value: "Zoom")
     try engine.editor.setSettingEnum("touch/rotateAction", value: "None")
+
+    // Press and hold an image, then drag it onto another image to exchange the two.
+    try engine.editor.setSettingBool("dragToSwapFills/enabled", value: true)
 
     try ([
       "appearance/adjustments", "appearance/filter", "appearance/effect",
@@ -70,7 +74,12 @@ public extension PhotoEditorConfiguration {
   /// Creates a scene from the default photo image.
   static let defaultCreateScene: OnCreate.Callback = { engine in
     // highlight-starter-kit-on-create-scene
-    let imageURL = Bundle(for: PhotoEditorConfiguration.self).url(forResource: "photo-ui-empty", withExtension: "png")!
+    #if SWIFT_PACKAGE
+      let bundle = Bundle.module
+    #else
+      let bundle = Bundle(for: PhotoEditorConfiguration.self)
+    #endif
+    let imageURL = bundle.url(forResource: "photo-ui-empty", withExtension: "png")!
     try await engine.scene.create(fromImage: imageURL)
     // highlight-starter-kit-on-create-scene
   }

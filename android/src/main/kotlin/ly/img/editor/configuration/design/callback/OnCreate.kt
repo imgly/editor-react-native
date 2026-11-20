@@ -43,12 +43,15 @@ suspend fun DesignConfigurationBuilder.onCreate(
  * The callback that is invoked before the scene is created.
  */
 fun DesignConfigurationBuilder.onPreCreateScene() {
+    editorContext.engine.editor.setSettingBoolean(keypath = "clip/defaultTransitionOverlapEnabled", value = false)
     showLoading = true
     // Enable horizontal sliding between pages
     editorContext.engine.editor.setSettingBoolean(
         keypath = "features/pageCarouselEnabled",
         value = true,
     )
+    // Press and hold an image, then drag it onto another image to exchange the two.
+    editorContext.engine.editor.setSettingBoolean(keypath = "dragToSwapFills/enabled", value = true)
 }
 
 /**

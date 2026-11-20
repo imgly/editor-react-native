@@ -7,7 +7,7 @@ import android.os.Parcelable
 enum class EditorSourceType(
     val value: String,
 ) : Parcelable {
-    /** A `.scene` file. */
+    /** A scene file (`.imgly` or the legacy `.scene`). */
     SCENE("scene"),
 
     /** An image file, e.g. `.png`. */

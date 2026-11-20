@@ -42,6 +42,7 @@ public extension PostcardEditorConfiguration {
   ///
   /// Sets editor role, touch gestures, camera clamping, and global scopes.
   static let defaultPreCreateScene: OnCreate.Callback = { engine in
+    try engine.editor.setSettingBool("clip/defaultTransitionOverlapEnabled", value: false)
     try engine.editor.setRole("Adopter")
     try engine.editor.setSettingEnum("camera/clamping/overshootMode", value: "Center")
 
@@ -51,6 +52,9 @@ public extension PostcardEditorConfiguration {
     try engine.editor.setSettingBool("touch/dragStartCanSelect", value: false)
     try engine.editor.setSettingEnum("touch/pinchAction", value: "Zoom")
     try engine.editor.setSettingEnum("touch/rotateAction", value: "None")
+
+    // Press and hold an image, then drag it onto another image to exchange the two.
+    try engine.editor.setSettingBool("dragToSwapFills/enabled", value: true)
 
     try ([
       "appearance/adjustments", "appearance/filter", "appearance/effect",
@@ -70,10 +74,12 @@ public extension PostcardEditorConfiguration {
   /// Loads the built-in empty postcard scene.
   static let defaultCreateScene: OnCreate.Callback = { engine in
     // highlight-starter-kit-on-create-scene
-    let sceneURL = Bundle(for: PostcardEditorConfiguration.self).url(
-      forResource: "postcard-empty",
-      withExtension: "scene",
-    )!
+    #if SWIFT_PACKAGE
+      let bundle = Bundle.module
+    #else
+      let bundle = Bundle(for: PostcardEditorConfiguration.self)
+    #endif
+    let sceneURL = bundle.url(forResource: "postcard-empty", withExtension: "scene")!
     try await engine.scene.load(from: sceneURL)
     // highlight-starter-kit-on-create-scene
   }

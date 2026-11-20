@@ -1,6 +1,6 @@
 #import "IMGLYEditorModule.h"
-#import "IMGLYEditorModule/IMGLYEditorModule-Swift.h"
 #import "IMGLYConstants.h"
+#import "IMGLYEditorModuleSupport.h"
 
 @implementation IMGLYEditorModule
 
@@ -52,31 +52,12 @@ RCT_EXPORT_METHOD(openEditor : (nonnull NSDictionary*)settings source : (nullabl
     metadata:(NSDictionary*)metadata
      resolve:(RCTPromiseResolveBlock)resolve
       reject:(RCTPromiseRejectBlock)reject {
-  EditorSettings* convertedSettings = [EditorSettings fromDictionary:settings];
-  if (convertedSettings == nil) {
-    reject(IMGLYErrorParsing, IMGLYErrorParsingMessage, nil);
+  id<IMGLYEditorModuleImplementation> implementation = IMGLYEditorModuleImplementationProvider.implementation;
+  if (implementation == nil) {
+    reject(IMGLYErrorImplementationMissing, IMGLYErrorImplementationMissingMessage, nil);
     return;
   }
-  EditorPreset convertedPreset = [EditorPresetParser fromString:preset];
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [[IMGLYEditorModuleSwiftAdapter shared] openEditor:convertedPreset
-                                              settings:convertedSettings
-                                              metadata:metadata
-                                            completion:^(EditorResult* _Nullable result, NSError* _Nullable error) {
-                                              if (result != nil) {
-                                                resolve(@ {
-                                                  @"artifact" : result.artifact,
-                                                  @"scene" : result.scene,
-                                                  @"thumbnail" : result.thumbnail,
-                                                  @"metadata" : result.metadata
-                                                });
-                                              } else if (error != nil) {
-                                                reject(IMGLYErrorExportFailed, IMGLYErrorExportFailedMessage, error);
-                                              } else {
-                                                resolve([NSNull null]);
-                                              }
-                                            }];
-  });
+  [implementation openEditorWithSettings:settings preset:preset metadata:metadata resolve:resolve reject:reject];
 }
 
 @end

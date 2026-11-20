@@ -49,6 +49,7 @@ suspend fun VideoConfigurationBuilder.onCreate(
 fun VideoConfigurationBuilder.onPreCreateScene() {
     showLoading = true
     val engine = editorContext.engine
+    engine.editor.setSettingBoolean(keypath = "clip/defaultTransitionOverlapEnabled", value = false)
     engine.editor.setSettingEnum(keypath = "touch/pinchAction", value = "Scale")
     engine.editor.setSettingBoolean(
         keypath = "controlGizmo/showRotateHandles",
@@ -64,6 +65,8 @@ fun VideoConfigurationBuilder.onPreCreateScene() {
         keypath = "page/innerBorderColor",
         value = Color.fromRGBA(0.67f, 0.67f, 0.67f, 0.5f),
     )
+    // Press and hold an image, then drag it onto another image to exchange the two.
+    engine.editor.setSettingBoolean(keypath = "dragToSwapFills/enabled", value = true)
 }
 
 /**
@@ -97,6 +100,7 @@ suspend fun VideoConfigurationBuilder.onLoadAssetSources() {
             "ly.img.text.styles",
             "ly.img.text.curves",
             "ly.img.text.components",
+            "ly.img.caption.presets",
             "ly.img.image",
             "ly.img.audio",
             "ly.img.video",
@@ -109,13 +113,6 @@ suspend fun VideoConfigurationBuilder.onLoadAssetSources() {
             }
         }
     }
-
-    // Required for animations
-    editorContext.engine.block.setMetadata(
-        block = requireNotNull(editorContext.engine.scene.get()),
-        key = "ly.img.defaultAssetSourcesBaseUri",
-        value = editorContext.baseUri.toString(),
-    )
 
     // Load local asset sources
     editorContext.engine.asset.addLocalSource(
